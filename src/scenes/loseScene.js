@@ -30,7 +30,7 @@ export default class LoseScene extends Phaser.Scene {
       wordWrap: { width: 1200, useAdvancedWrap: true }
     });
     text1.setOrigin(0.5);
-    text1.setColor('orange');
+    text1.setColor('#ffb71b');
     text1.setFontFamily('Toriga');
     text1.setFontSize(110);
     text1.setAlign('center');
@@ -41,7 +41,7 @@ export default class LoseScene extends Phaser.Scene {
       wordWrap: { width: 1200, useAdvancedWrap: true }
     });
     text2.setOrigin(0.5);
-    text2.setColor('blue');
+    text2.setColor('#00a0e0');
     text2.setFontFamily('Toriga');
     text2.setFontSize(70);
     text2.setAlign('center');

@@ -31,7 +31,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
 
     text1 = this.add.text(screenCenterX, 200, gameData.gameName);
     text1.setOrigin(0.5);
-    text1.setColor('orange');
+    text1.setColor('#ffb71b');
     text1.setFontFamily('Toriga');
     text1.setFontSize(80);
     text1.setAlign('left');
@@ -40,7 +40,7 @@ export default class SelectCharacterScene extends Phaser.Scene {
 
     let text2 = this.add.text(screenCenterX, 290, 'Choose your character');
     text2.setOrigin(0.5);
-    text2.setColor('blue');
+    text2.setColor('#00a0e0');
     text2.setFontFamily('Toriga');
     text2.setFontSize(80);
     text2.setAlign('center');

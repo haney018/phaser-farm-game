@@ -9,8 +9,8 @@ var playerData = {
   interactType: null,
   interactZone: null
 };
-var processTime = 2000;
-var progressTime = 4000;
+var processTime = 1000;
+var progressTime = 4500;
 var moveSpeed = 400;
 var pauseButton;
 var countDown;
@@ -200,14 +200,14 @@ export default class GameFowl extends Phaser.Scene {
     this.anims.create({
       key: 'coop-angry',
       frames: this.anims.generateFrameNumbers('coop', { start: 0, end: 9 }),
-      frameRate: 20,
+      frameRate: 40,
       repeat: -1
     });
 
     this.anims.create({
       key: 'coop-angry-select',
       frames: this.anims.generateFrameNumbers('coop', { start: 10, end: 19 }),
-      frameRate: 20,
+      frameRate: 40,
       repeat: -1
     });
   }
@@ -419,9 +419,11 @@ export default class GameFowl extends Phaser.Scene {
       });
     })
 
-    this.add.image(1690, 120, 'timerBlob');
+    let blob = this.add.image(1690, 120, 'timerBlob');
+    blob.setDepth(4);
 
     countDown = this.add.text(1540, 60, '00:00');
+    countDown.setDepth(4)
     countDown.setOrigin(0, 0);
     countDown.setFontFamily('Toriga');
     countDown.setFontSize(110);
@@ -585,8 +587,13 @@ export default class GameFowl extends Phaser.Scene {
       delay: progressTime,                // ms
       callback: () => {
         for (let i = 0; i < coopListData.length; i++) {
-          let random = Math.floor(Math.random() *  Math.floor(10));
-          coopListData[i].value = coopListData[i].value + random;
+          let random;
+          if (chickenGroupData[i].value > 80) {
+            random = Math.floor(Math.random() *  Math.floor(10));
+          } else {
+            random = Math.floor(Math.random() *  Math.floor(5));
+          }
+          chickenGroupData[i].value = chickenGroupData[i].value + random;
           if (coopListData[i].value >= 100) {
             coopListData[i].value = 100;
             this.coopTimer.remove();
@@ -681,15 +688,15 @@ export default class GameFowl extends Phaser.Scene {
     playerBar.clear();
     playerBar.setDepth(3);
 
-    playerBar.fillStyle(0x999999);
-    playerBar.fillRect(x - 5, y - 5, 110, 20);
+    playerBar.fillStyle(0x00a0e0);
+    playerBar.fillRect(x - 3, y - 3, 106, 16);
 
     if (value > 80) {
-      playerBar.fillStyle(0x00FF00, 1);
+      playerBar.fillStyle(0xec1c25, 1);
     } else if (value > 40 && value <= 80) {
-      playerBar.fillStyle(0xFFFF00, 1);
+      playerBar.fillStyle(0xffb71b, 1);
     } else {
-      playerBar.fillStyle(0xFF0000, 1);
+      playerBar.fillStyle(0xffb71b, 1);
     }
     playerBar.fillRect(x, y, value, 10);
     this.add.existing(playerBar);
@@ -738,15 +745,15 @@ export default class GameFowl extends Phaser.Scene {
     coopListData[i].bar.clear();
     coopListData[i].bar.setDepth(3);
 
-    coopListData[i].bar.fillStyle(0x999999);
-    coopListData[i].bar.fillRect(x - 5, y - 5, 110, 30);
+    coopListData[i].bar.fillStyle(0x00a0e0);
+    coopListData[i].bar.fillRect(x - 3, y - 3, 106, 26);
 
     if (value > 80) {
-      coopListData[i].bar.fillStyle(0xFF0000, 1);
+      coopListData[i].bar.fillStyle(0xec1c25, 1);
     } else if (value > 40 && value <= 80) {
-      coopListData[i].bar.fillStyle(0xFFFF00, 1);
+      coopListData[i].bar.fillStyle(0xffb71b, 1);
     } else {
-      coopListData[i].bar.fillStyle(0x00FF00, 1);
+      coopListData[i].bar.fillStyle(0xffb71b, 1);
     }
 
     coopListData[i].bar.fillRect(x, y, value, 20);

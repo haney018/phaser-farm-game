@@ -1,4 +1,6 @@
 var activeGameId = 'shade';
+var counter = 0;
+var loadingText;
 var gameData = {
   'fowl': {
     gameId: 'fowl',
@@ -18,8 +20,8 @@ var gameData = {
     introPath: 'scrambled-shade/shade_intro.png',
     worldPath: 'scrambled-shade/shade_backround.jpg',
     helpPath: 'scrambled-shade/shade_instructions.png',
-    winText: '',
-    loseText: '',
+    winText: 'You sure made the hens had shelter out of the hot sun',
+    loseText: 'You didn\'d give the hens enough shade out of the hot sun',
     player: null
   }
 }
@@ -37,14 +39,42 @@ export default class ContainerScene extends Phaser.Scene {
     let world = this.add.image(0, 0, 'world');
     world.setOrigin(0, 0);
 
-    let text1 = this.add.text(600, 150, 'Loading...');
-    text1.setOrigin(0, 0);
-    text1.setColor('orange');
-    text1.setFontFamily('Toriga');
-    text1.setFontSize(100);
-    text1.setAlign('center');
+    let screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+
+    let testText = this.add.text(screenCenterX, 200, '', {
+      wordWrap: { width: 1200, useAdvancedWrap: true, fontFamily: 'Toriga', font: 'Toriga' }
+    });
+    testText.setOrigin(0.5);
+    testText.setColor('#00a0e0');
+
+    loadingText = this.add.text(screenCenterX, 450, 'Loading...', {
+      wordWrap: { width: 1200, useAdvancedWrap: true }
+    });
+    loadingText.setOrigin(0.5);
+    loadingText.setColor('#00a0e0');
+    loadingText.setFontFamily('Toriga');
+    loadingText.setFontSize(100);
+    loadingText.setAlign('center');
 
     this.scene.launch('StartScene', gameData[activeGameId]);
-    // this.scene.launch(gameData[activeGameId].sceneName, gameData[activeGameId]);
+  }
+
+  update() {
+    // loadingText.setFontFamily('Toriga');
+    this.time.addEvent({
+      delay: 1000,                // ms
+      callback: () => {
+        loadingText.setFontFamily('Toriga');
+
+        if (counter < 4) {
+          let currentText = loadingText.text;
+          loadingText.setText(currentText);
+        } else {
+          counter = 0;
+        }
+        counter++;
+      },
+      loop: true
+    });
   }
 }

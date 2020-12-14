@@ -32,7 +32,7 @@ export default class PauseScene extends Phaser.Scene {
       wordWrap: { width: 1200, useAdvancedWrap: true }
     });
     text1.setOrigin(0.5);
-    text1.setColor('orange');
+    text1.setColor('#ffb71b');
     text1.setFontFamily('Toriga');
     text1.setFontSize(110);
     text1.setAlign('center');
