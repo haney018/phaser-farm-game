@@ -19,9 +19,15 @@ export default class WinnerScene extends Phaser.Scene {
     this.load.image('resumeButton', require('../assets/btn_continue.png'));
     this.load.image('restartButton', require('../assets/btn_restart.png'));
     this.load.image('exitButton', require('../assets/btn_exit.png'));
+
+    this.load.audio('winner', require(`../assets/audio/try-again/winner.wav`));
+
   }
 
   create() {
+    let winner = this.sound.add('winner');
+    winner.play();
+
     let modal = this.add.image(0, 0, 'modal');
     modal.setOrigin(0, 0);
 

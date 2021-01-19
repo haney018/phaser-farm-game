@@ -10,7 +10,7 @@ var playerData = {
   interactZone: null
 };
 var processTime = 1000;
-var progressTime = 4500;
+var progressTime = 2500;
 var moveSpeed = 400;
 var pauseButton;
 var countDown;
@@ -72,8 +72,8 @@ export default class GameFowl extends Phaser.Scene {
 
     this.load.spritesheet('coop', require('../assets/fowl-fertilizer/coop1_ss_complete.png'), { frameWidth: 400, frameHeight: 290 });
 
-    this.load.spritesheet('eggsplain', require('../assets/fowl-fertilizer/eggsplain_ss.png'), { frameWidth: 301, frameHeight: 341 });
-    this.load.spritesheet('eggsplore', require('../assets/fowl-fertilizer/eggsplore_ss.png'), { frameWidth: 300.75, frameHeight: 341 });
+    this.load.spritesheet('eggsplain', require('../assets/eggsplain_ss.png'), { frameWidth: 300.75, frameHeight: 341 });
+    this.load.spritesheet('eggsplore', require('../assets/eggsplore_ss.png'), { frameWidth: 300.75, frameHeight: 341 });
 
     this.load.image('fertilizer', require('../assets/fowl-fertilizer/fowlfertlisers.png'));
 
@@ -250,80 +250,80 @@ export default class GameFowl extends Phaser.Scene {
 
     this.anims.create({
       key: 'turn',
-      frames: [ { key: playerData.playerName, frame: 11 } ],
+      frames: [ { key: playerData.playerName, frame: 20 } ],
       frameRate: 20
     });
 
     this.anims.create({
       key: 'turn-bucket',
-      frames: [ { key: playerData.playerName, frame: 27 } ],
+      frames: [ { key: playerData.playerName, frame: 4 } ],
       frameRate: 20
     });
 
     this.anims.create({
       key: 'interact-coop',
-      frames: [ { key: playerData.playerName, frame: 15 } ],
+      frames: [ { key: playerData.playerName, frame: 16 } ],
       frameRate: 20
     });
 
     this.anims.create({
       key: 'interact-fert',
-      frames: [ { key: playerData.playerName, frame: 27 } ],
+      frames: [ { key: playerData.playerName, frame: 4 } ],
       frameRate: 20
     });
 
     this.anims.create({
         key: 'left',
-        frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 4, end: 7 }),
+        frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 24, end: 27 }),
         frameRate: 10,
         repeat: -1
     });
 
     this.anims.create({
       key: 'left-bucket',
-      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 20, end: 23 }),
+      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 8, end: 11 }),
       frameRate: 10,
       repeat: -1
     });
 
     this.anims.create({
       key: 'right',
-      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: 'right-bucket',
-      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 16, end: 19 }),
-      frameRate: 10,
-      repeat: -1
-    });    
-
-    this.anims.create({
-      key: 'up',
-      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 12, end: 15   }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: 'up-bucket',
       frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 28, end: 31 }),
       frameRate: 10,
       repeat: -1
     });
 
     this.anims.create({
+      key: 'right-bucket',
+      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 12, end: 15 }),
+      frameRate: 10,
+      repeat: -1
+    });    
+
+    this.anims.create({
+      key: 'up',
+      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 16, end: 19   }),
+      frameRate: 10,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'up-bucket',
+      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1
+    });
+
+    this.anims.create({
       key: 'down',
-      frames: playerData.value ? this.anims.generateFrameNumbers(playerData.playerName, { start: 24, end: 27 }) : this.anims.generateFrameNumbers(playerData.playerName, { start: 8, end: 11 }),
+      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 20, end: 23 }),
       frameRate: 10,
       repeat: -1
     });
 
     this.anims.create({
       key: 'down-bucket',
-      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 24, end: 27 }),
+      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 4, end: 7 }),
       frameRate: 10,
       repeat: -1
     });
@@ -462,8 +462,8 @@ export default class GameFowl extends Phaser.Scene {
     this.dpad.setScale(0.7);
     this.dpad.alpha = .5;
 
-    this.upDpad = this.add.image(this.dpad.x, (this.dpad.y + 20) - this.dpad.displayHeight / 2, "hidden-dpad");
-    this.upDpad.setScale(0.5);
+    this.upDpad = this.add.image(this.dpad.x, (this.dpad.y + 50) - this.dpad.displayHeight / 2, "hidden-dpad");
+    this.upDpad.setScale(0.8);
     this.upDpad.alpha = .01;
     this.upDpad.setInteractive()
       .on('pointerdown', () => { this.isUpPad = true })
@@ -471,8 +471,8 @@ export default class GameFowl extends Phaser.Scene {
       .on('pointerup', () => { this.isUpPad = false })
       .on('pointerout', () => { this.isUpPad = false });
     
-    this.downDpad = this.add.image(this.dpad.x, (this.dpad.y - 20) + this.dpad.displayHeight / 2, "hidden-dpad");
-    this.downDpad.setScale(0.5);
+    this.downDpad = this.add.image(this.dpad.x, (this.dpad.y - 50) + this.dpad.displayHeight / 2, "hidden-dpad");
+    this.downDpad.setScale(0.8);
     this.downDpad.alpha = .01;
     this.downDpad.setInteractive()
       .on('pointerdown', () => { this.isDownPad = true })
@@ -480,8 +480,8 @@ export default class GameFowl extends Phaser.Scene {
       .on('pointerup', () => { this.isDownPad = false })
       .on('pointerout', () => { this.isDownPad = false });
 
-    this.leftDpad = this.add.image((this.dpad.x + 20) - this.dpad.displayWidth / 2, this.dpad.y, "hidden-dpad");
-    this.leftDpad.setScale(0.5);
+    this.leftDpad = this.add.image((this.dpad.x + 40) - this.dpad.displayWidth / 2, this.dpad.y, "hidden-dpad");
+    this.leftDpad.setScale(0.8);
     this.leftDpad.alpha = .01;
     this.leftDpad.setInteractive()
       .on('pointerdown', () => { this.isLeftPad = true })
@@ -489,8 +489,8 @@ export default class GameFowl extends Phaser.Scene {
       .on('pointerup', () => { this.isLeftPad = false })
       .on('pointerout', () => { this.isLeftPad = false });
     
-    this.rightDpad = this.add.image((this.dpad.x - 20) + this.dpad.displayWidth / 2, this.dpad.y, "hidden-dpad");
-    this.rightDpad.setScale(0.5);
+    this.rightDpad = this.add.image((this.dpad.x - 40) + this.dpad.displayWidth / 2, this.dpad.y, "hidden-dpad");
+    this.rightDpad.setScale(0.8);
     this.rightDpad.alpha = .01;
     this.rightDpad.setInteractive()
       .on('pointerdown', () => { this.isRightPad = true })
@@ -498,10 +498,11 @@ export default class GameFowl extends Phaser.Scene {
       .on('pointerup', () => { this.isRightPad = false })
       .on('pointerout', () => { this.isRightPad = false });
 
+    this.actionGroup = this.physics.add.staticGroup();
+
     this.actionPad = this.add.image(1750, 870, 'action');
     this.actionPad.setScale(0.3);
     this.actionPad.setDepth(4);
-    this.actionPad.alpha = .5;
     this.actionPad.setInteractive()
       .on('pointerdown', () => { 
         this.isActionPad = true
@@ -516,6 +517,19 @@ export default class GameFowl extends Phaser.Scene {
         collider_p2c = true
         collider_p2f = true
       });
+    this.actionGroup.add(this.actionPad)
+
+    this.actionLabel = this.add.text(1640, 840, 'Collect', {
+      wordWrap: { width: 220, useAdvancedWrap: true }
+    });
+    this.actionLabel.setFontFamily('Toriga');
+    this.actionLabel.setFontSize(55);
+    this.actionLabel.setAlign('center');
+    this.actionLabel.setDepth(5);
+    // this.actionLabel.setColor('#00a0e0');
+    this.actionGroup.add(this.actionLabel)
+
+    this.actionGroup.setAlpha(0.2);
   }
 
   interactOne(player, coop) {
@@ -588,12 +602,12 @@ export default class GameFowl extends Phaser.Scene {
       callback: () => {
         for (let i = 0; i < coopListData.length; i++) {
           let random;
-          if (chickenGroupData[i].value > 80) {
+          if (coopListData[i].value > 80) {
             random = Math.floor(Math.random() *  Math.floor(10));
           } else {
             random = Math.floor(Math.random() *  Math.floor(5));
           }
-          chickenGroupData[i].value = chickenGroupData[i].value + random;
+          coopListData[i].value = coopListData[i].value + random;
           if (coopListData[i].value >= 100) {
             coopListData[i].value = 100;
             this.coopTimer.remove();
@@ -634,7 +648,7 @@ export default class GameFowl extends Phaser.Scene {
       this.downDpad.visible = false;
       this.leftDpad.visible = false;
       this.rightDpad.visible = false;
-      this.actionPad.visible = false;
+      this.actionGroup.visible = false;
     }
     else{
       this.dpad.visible = true;
@@ -642,7 +656,19 @@ export default class GameFowl extends Phaser.Scene {
       this.downDpad.visible = true;
       this.leftDpad.visible = true;
       this.rightDpad.visible = true;
-      this.actionPad.visible = true;
+      this.actionGroup.visible = true;
+    }
+
+    let hasSelected = coopListData.filter(val => val.selected)
+    let boundsA = playerData.interactZone.getBounds();
+    let boundsB = this.fertOverlap.children.entries[0].getBounds();
+    let inFertilizer = Phaser.Geom.Intersects.RectangleToRectangle(boundsA, boundsB)
+
+    if (hasSelected.length || inFertilizer) {
+      this.actionLabel.setText(inFertilizer ? ' Empty ' : 'Collect')
+      this.actionGroup.setAlpha(0.6);
+    } else {
+      this.actionGroup.setAlpha(0.1);
     }
   }
 

@@ -23,7 +23,7 @@ export default class HelpScene extends Phaser.Scene {
     let help = this.add.image(0, 0, 'help');
     help.setOrigin(0, 0);
 
-    continueButton = this.add.image(screenCenterX, 960, 'continueButton');
+    continueButton = this.add.image(screenCenterX, 972, 'continueButton');
     continueButton.setOrigin(0.5);
     continueButton.setInteractive( { useHandCursor: true  } );
 

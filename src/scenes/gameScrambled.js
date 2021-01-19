@@ -47,17 +47,17 @@ export default class GameScrambled extends Phaser.Scene {
     timeLimitSec = 121;
     timer;
     chickenGroupData = [
-      { x: -20, y: 150, value: 0, selected: false, bar: null, type: null, isComplete: false },
+      { x: 0, y: 180, value: 0, selected: false, bar: null, type: null, isComplete: false },
       { x: 660, y: 180, value: 0, selected: false, bar: null, type: null, isComplete: false },
-      { x: 1340, y: 150, value: 0, selected: false, bar: null, type: null, isComplete: false },
+      { x: 1395, y: 180, value: 0, selected: false, bar: null, type: null, isComplete: false },
 
-      { x: -20, y: 450, value: 0, selected: false, bar: null, type: null, isComplete: false },
+      { x: 0, y: 470, value: 0, selected: false, bar: null, type: null, isComplete: false },
       { x: 660, y: 470, value: 0, selected: false, bar: null, type: null, isComplete: false },
-      { x: 1340, y: 450, value: 0, selected: false, bar: null, type: null, isComplete: false },
+      { x: 1395, y: 470, value: 0, selected: false, bar: null, type: null, isComplete: false },
     
-      { x: -20, y: 750, value: 0, selected: false, bar: null, type: null, isComplete: false },
+      { x: 0, y: 770, value: 0, selected: false, bar: null, type: null, isComplete: false },
       { x: 660, y: 770, value: 0, selected: false, bar: null, type: null, isComplete: false },
-      { x: 1340, y: 750, value: 0, selected: false, bar: null, type: null, isComplete: false },
+      { x: 1395, y: 770, value: 0, selected: false, bar: null, type: null, isComplete: false },
     ];
     chickenTypes = ['shrub', 'tree', 'shelter']
     collider_p2c = true;
@@ -89,9 +89,10 @@ export default class GameScrambled extends Phaser.Scene {
     this.load.spritesheet('shelter', require('../assets/scrambled-shade/shelter_ss.png'), { frameWidth: 750, frameHeight: 405 });
 
     this.load.spritesheet('poof', require('../assets/scrambled-shade/poof_ss.png'), { frameWidth: 750, frameHeight: 405 });
+    this.load.image('highlight', require('../assets/scrambled-shade/shade_highlight.png'), { frameWidth: 750, frameHeight: 405 });
 
-    this.load.spritesheet('eggsplain', require('../assets/fowl-fertilizer/eggsplain_ss.png'), { frameWidth: 301, frameHeight: 341 });
-    this.load.spritesheet('eggsplore', require('../assets/fowl-fertilizer/eggsplore_ss.png'), { frameWidth: 300.75, frameHeight: 341 });
+    this.load.spritesheet('eggsplain', require('../assets/eggsplain_ss.png'), { frameWidth: 300.75, frameHeight: 341 });
+    this.load.spritesheet('eggsplore', require('../assets/eggsplore_ss.png'), { frameWidth: 300.75, frameHeight: 341 });
 
     this.load.image('equip-shrub', require('../assets/scrambled-shade/shade_bubble_shrub.png'));
     this.load.image('equip-tree', require('../assets/scrambled-shade/shade_bubble_tree.png'));
@@ -159,13 +160,21 @@ export default class GameScrambled extends Phaser.Scene {
     this.zIndexOverlaps = this.physics.add.group();
     this.interactOverlaps = this.physics.add.group();
     this.poofEffects = this.physics.add.group();
+    this.highlightEffects = this.physics.add.group();
      
     for (let i = 0; i < chickenGroupData.length; i++) {
       let obj = chickenGroupData[i];
       let type = obj.type
 
+      let highlight = this.add.image(obj.x - 40, obj.y + 40, 'highlight');
+      highlight.setScale(1);
+      highlight.setDepth(0);
+      highlight.setOrigin(0, 0);
+      highlight._dataIndex = i
+      this.highlightEffects.add(highlight)
+
       let chickenImage = this.add.sprite(obj.x, obj.y, type);
-      chickenImage.setScale(0.8);
+      chickenImage.setScale(0.7);
       chickenImage.setOrigin(0, 0);
       chickenImage._dataIndex = i
       this.chickens.add(chickenImage)
@@ -192,11 +201,13 @@ export default class GameScrambled extends Phaser.Scene {
       this.interactOverlaps.add(interact)
 
       let poofImage = this.add.sprite(obj.x, obj.y, 'poof', 7);
-      poofImage.setScale(0.8);
+      poofImage.setScale(0.7);
       poofImage.setDepth(3);
       poofImage.setOrigin(0, 0);
       poofImage._dataIndex = i
       this.poofEffects.add(poofImage)
+
+      
 
       chickenGroupData[i].bar = new Phaser.GameObjects.Graphics(this)
     }
@@ -226,21 +237,21 @@ export default class GameScrambled extends Phaser.Scene {
 
     this.anims.create({
       key: 'shrub-angry',
-      frames: this.anims.generateFrameNumbers('shrub', { start: 10, end: 19 }),
+      frames: this.anims.generateFrameNumbers('shrub', { start: 20, end: 29 }),
       frameRate: 30,
       repeat: -1
     });
 
     this.anims.create({
       key: 'shrub-angry-select',
-      frames: this.anims.generateFrameNumbers('shrub', { start: 10, end: 19 }),
+      frames: this.anims.generateFrameNumbers('shrub', { start: 20, end: 29 }),
       frameRate: 30,
       repeat: -1
     });
 
     this.anims.create({
       key: 'shrub-build',
-      frames: this.anims.generateFrameNumbers('shrub', { start: 20, end: 29 }),
+      frames: this.anims.generateFrameNumbers('shrub', { start: 40, end: 49 }),
       frameRate: 15,
       repeat: -1
     });
@@ -261,21 +272,21 @@ export default class GameScrambled extends Phaser.Scene {
 
     this.anims.create({
       key: 'tree-angry',
-      frames: this.anims.generateFrameNumbers('tree', { start: 10, end: 19 }),
+      frames: this.anims.generateFrameNumbers('tree', { start: 20, end: 29 }),
       frameRate: 30,
       repeat: -1
     });
 
     this.anims.create({
       key: 'tree-angry-select',
-      frames: this.anims.generateFrameNumbers('tree', { start: 10, end: 19 }),
+      frames: this.anims.generateFrameNumbers('tree', { start: 20, end: 29 }),
       frameRate: 30,
       repeat: -1
     });
 
     this.anims.create({
       key: 'tree-build',
-      frames: this.anims.generateFrameNumbers('tree', { start: 20, end: 29 }),
+      frames: this.anims.generateFrameNumbers('tree', { start: 40, end: 49 }),
       frameRate: 15,
       repeat: -1
     });
@@ -296,21 +307,21 @@ export default class GameScrambled extends Phaser.Scene {
 
     this.anims.create({
       key: 'shelter-angry',
-      frames: this.anims.generateFrameNumbers('shelter', { start: 10, end: 19 }),
-      frameRate: 30,
+      frames: this.anims.generateFrameNumbers('shelter', { start: 20, end: 29 }),
+      frameRate: 20,
       repeat: -1
     });
 
     this.anims.create({
       key: 'shelter-angry-select',
-      frames: this.anims.generateFrameNumbers('shelter', { start: 10, end: 19 }),
-      frameRate: 30,
+      frames: this.anims.generateFrameNumbers('shelter', { start: 20, end: 29 }),
+      frameRate: 15,
       repeat: -1
     });
 
     this.anims.create({
       key: 'shelter-build',
-      frames: this.anims.generateFrameNumbers('shelter', { start: 20, end: 29 }),
+      frames: this.anims.generateFrameNumbers('shelter', { start: 40, end: 49 }),
       frameRate: 15,
       repeat: -1
     });
@@ -323,12 +334,18 @@ export default class GameScrambled extends Phaser.Scene {
     for (let i = 0; i < chickenTypes.length; i++) {
       let type = chickenTypes[i];
 
-      let matImage = this.add.image(xPos, 10, `mat-${type}`);
+      let matImage = this.add.image(xPos, 5, `mat-${type}`);
       matImage.setOrigin(0, 0);
       matImage._data = type
       this.matImages.add(matImage)
+      // matImage.body.setOffset(0, -100);
+      // matImage.setSize(100, 50);
+      // matImage.setBottom(-50)
+      // console.log(matImage)
       xPos = xPos + 200;
     }
+
+
   }
 
   createPlayer() {
@@ -343,7 +360,7 @@ export default class GameScrambled extends Phaser.Scene {
 
     playerData.interactZone = this.physics.add.group();
 
-    let vertical = this.add.zone(player.x, player.y).setSize(10, 130);
+    let vertical = this.add.zone(player.x, player.y).setSize(10, 150);
     this.physics.world.enable(vertical);
     vertical.body.setAllowGravity(false);
     vertical.body.debugBodyColor = 0x00ffff
@@ -371,83 +388,83 @@ export default class GameScrambled extends Phaser.Scene {
 
     this.anims.create({
       key: 'turn',
-      frames: [ { key: playerData.playerName, frame: 11 } ],
+      frames: [ { key: playerData.playerName, frame: 20 } ],
       frameRate: 20
     });
 
     this.anims.create({
       key: 'turn-bucket',
-      frames: [ { key: playerData.playerName, frame: 27 } ],
+      frames: [ { key: playerData.playerName, frame: 4 } ],
       frameRate: 20
     });
 
     this.anims.create({
       key: 'interact-coop',
-      frames: [ { key: playerData.playerName, frame: 15 } ],
+      frames: [ { key: playerData.playerName, frame: 16 } ],
       frameRate: 20
     });
 
     this.anims.create({
       key: 'interact-fert',
-      frames: [ { key: playerData.playerName, frame: 27 } ],
+      frames: [ { key: playerData.playerName, frame: 4 } ],
       frameRate: 20
     });
 
     this.anims.create({
         key: 'left',
-        frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 4, end: 7 }),
+        frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 24, end: 27 }),
         frameRate: 10,
         repeat: -1
     });
 
     this.anims.create({
       key: 'left-bucket',
-      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 20, end: 23 }),
+      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 8, end: 11 }),
       frameRate: 10,
       repeat: -1
     });
 
     this.anims.create({
       key: 'right',
-      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 0, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: 'right-bucket',
-      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 16, end: 19 }),
-      frameRate: 10,
-      repeat: -1
-    });    
-
-    this.anims.create({
-      key: 'up',
-      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 12, end: 15   }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: 'up-bucket',
       frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 28, end: 31 }),
       frameRate: 10,
       repeat: -1
     });
 
     this.anims.create({
+      key: 'right-bucket',
+      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 12, end: 15 }),
+      frameRate: 10,
+      repeat: -1
+    });    
+
+    this.anims.create({
+      key: 'up',
+      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 16, end: 19   }),
+      frameRate: 10,
+      repeat: -1
+    });
+
+    this.anims.create({
+      key: 'up-bucket',
+      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 0, end: 3 }),
+      frameRate: 10,
+      repeat: -1
+    });
+
+    this.anims.create({
       key: 'down',
-      frames: playerData.value ? this.anims.generateFrameNumbers(playerData.playerName, { start: 24, end: 27 }) : this.anims.generateFrameNumbers(playerData.playerName, { start: 8, end: 11 }),
+      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 20, end: 23 }),
       frameRate: 10,
       repeat: -1
     });
 
     this.anims.create({
       key: 'down-bucket',
-      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 24, end: 27 }),
+      frames: this.anims.generateFrameNumbers(playerData.playerName, { start: 4, end: 7 }),
       frameRate: 10,
       repeat: -1
-    });  
+    });
   }
 
   createColliders() {
@@ -538,8 +555,8 @@ export default class GameScrambled extends Phaser.Scene {
     this.dpad.setScale(0.7);
     this.dpad.alpha = .5;
 
-    this.upDpad = this.add.image(this.dpad.x, (this.dpad.y + 20) - this.dpad.displayHeight / 2, "hidden-dpad");
-    this.upDpad.setScale(0.5);
+    this.upDpad = this.add.image(this.dpad.x, (this.dpad.y + 50) - this.dpad.displayHeight / 2, "hidden-dpad");
+    this.upDpad.setScale(0.8);
     this.upDpad.alpha = .01;
     this.upDpad.setInteractive()
       .on('pointerdown', () => { this.isUpPad = true })
@@ -547,8 +564,8 @@ export default class GameScrambled extends Phaser.Scene {
       .on('pointerup', () => { this.isUpPad = false })
       .on('pointerout', () => { this.isUpPad = false });
     
-    this.downDpad = this.add.image(this.dpad.x, (this.dpad.y - 20) + this.dpad.displayHeight / 2, "hidden-dpad");
-    this.downDpad.setScale(0.5);
+    this.downDpad = this.add.image(this.dpad.x, (this.dpad.y - 50) + this.dpad.displayHeight / 2, "hidden-dpad");
+    this.downDpad.setScale(0.8);
     this.downDpad.alpha = .01;
     this.downDpad.setInteractive()
       .on('pointerdown', () => { this.isDownPad = true })
@@ -556,8 +573,8 @@ export default class GameScrambled extends Phaser.Scene {
       .on('pointerup', () => { this.isDownPad = false })
       .on('pointerout', () => { this.isDownPad = false });
 
-    this.leftDpad = this.add.image((this.dpad.x + 20) - this.dpad.displayWidth / 2, this.dpad.y, "hidden-dpad");
-    this.leftDpad.setScale(0.5);
+    this.leftDpad = this.add.image((this.dpad.x + 40) - this.dpad.displayWidth / 2, this.dpad.y, "hidden-dpad");
+    this.leftDpad.setScale(0.8);
     this.leftDpad.alpha = .01;
     this.leftDpad.setInteractive()
       .on('pointerdown', () => { this.isLeftPad = true })
@@ -565,8 +582,8 @@ export default class GameScrambled extends Phaser.Scene {
       .on('pointerup', () => { this.isLeftPad = false })
       .on('pointerout', () => { this.isLeftPad = false });
     
-    this.rightDpad = this.add.image((this.dpad.x - 20) + this.dpad.displayWidth / 2, this.dpad.y, "hidden-dpad");
-    this.rightDpad.setScale(0.5);
+    this.rightDpad = this.add.image((this.dpad.x - 40) + this.dpad.displayWidth / 2, this.dpad.y, "hidden-dpad");
+    this.rightDpad.setScale(0.8);
     this.rightDpad.alpha = .01;
     this.rightDpad.setInteractive()
       .on('pointerdown', () => { this.isRightPad = true })
@@ -574,10 +591,11 @@ export default class GameScrambled extends Phaser.Scene {
       .on('pointerup', () => { this.isRightPad = false })
       .on('pointerout', () => { this.isRightPad = false });
 
+    this.actionGroup = this.physics.add.staticGroup();
+
     this.actionPad = this.add.image(1750, 870, 'action');
     this.actionPad.setScale(0.3);
     this.actionPad.setDepth(4);
-    this.actionPad.alpha = .5;
     this.actionPad.setInteractive()
       .on('pointerdown', () => { 
         this.isActionPad = true
@@ -592,6 +610,19 @@ export default class GameScrambled extends Phaser.Scene {
         collider_p2c = true
         collider_p2f = true
       });
+    this.actionGroup.add(this.actionPad)
+
+    this.actionLabel = this.add.text(1665, 840, 'Build', {
+      wordWrap: { width: 200, useAdvancedWrap: true }
+    });
+    this.actionLabel.setFontFamily('Toriga');
+    this.actionLabel.setFontSize(60);
+    this.actionLabel.setAlign('center');
+    this.actionLabel.setDepth(5);
+    // this.actionLabel.setColor('#00a0e0');
+    this.actionGroup.add(this.actionLabel)
+
+    this.actionGroup.setAlpha(0.2);
   }
 
   interactOne(playerZone, chickens) {
@@ -700,7 +731,7 @@ export default class GameScrambled extends Phaser.Scene {
         let deduction = newType === 'shrub' ? 200 : 90
         chickenImage.body.setSize(chickenImage.displayWidth - deduction, 10);
       }, 500);
-    }, 3500); 
+    }, 4500); 
   }
 
   randomChicken() {
@@ -790,7 +821,7 @@ export default class GameScrambled extends Phaser.Scene {
       this.downDpad.visible = false;
       this.leftDpad.visible = false;
       this.rightDpad.visible = false;
-      this.actionPad.visible = false;
+      this.actionGroup.visible = false;
     }
     else{
       this.dpad.visible = true;
@@ -798,7 +829,14 @@ export default class GameScrambled extends Phaser.Scene {
       this.downDpad.visible = true;
       this.leftDpad.visible = true;
       this.rightDpad.visible = true;
-      this.actionPad.visible = true;
+      this.actionGroup.visible = true;
+    }
+
+    let hasSelected = chickenGroupData.filter(val => val.selected)
+    if (hasSelected.length) {
+      this.actionGroup.setAlpha(0.5);
+    } else {
+      this.actionGroup.setAlpha(0.1);
     }
   }
 
@@ -879,7 +917,8 @@ export default class GameScrambled extends Phaser.Scene {
       let boundsB = coopOvelap.getBounds();
 
       chickenGroupData[i].selected = Phaser.Geom.Intersects.RectangleToRectangle(boundsA1, boundsB) || Phaser.Geom.Intersects.RectangleToRectangle(boundsA2, boundsB)
-      
+      this.highlightEffects.children.entries[i].setVisible(chickenGroupData[i].selected)
+
       if (!chickenGroupData[i].isComplete) {
         if (chickenGroupData[i].value < 80) {
           animKey = chickenGroupData[i].selected ? `${chickenGroupData[i].type}-normal-select` : `${chickenGroupData[i].type}-normal`
@@ -922,7 +961,7 @@ export default class GameScrambled extends Phaser.Scene {
       let obj = chickenGroupData[i]
       let currentVal = obj.value
       this.chickens.children.entries[i]._coopValue = currentVal
-      this.redrawChickenBar(i, (obj.x + 250), (obj.y + 150), obj.value);
+      this.redrawChickenBar(i, (obj.x + 200), (obj.y + 100), obj.value);
     }
   }
 

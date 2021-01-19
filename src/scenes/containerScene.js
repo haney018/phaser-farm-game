@@ -1,7 +1,18 @@
-var activeGameId = 'shade';
+var activeGameId = 'sunny';
 var counter = 0;
 var loadingText;
 var gameData = {
+  'sunny': {
+    gameId: 'sunny',
+    gameName: 'Sunny Side',
+    sceneName: 'GameSunny',
+    introPath: 'sunny-side/sunny_intro.png',
+    worldPath: 'sunny-side/sunny_background.png',
+    helpPath: 'sunny-side/sunny_instructions.png',
+    winText: 'You provided enough power to the egg factory',
+    loseText: 'You weren\'t able to supply enough power to the egg factory',
+    player: null
+  },
   'fowl': {
     gameId: 'fowl',
     gameName: 'Fowl Fertilizer',
@@ -21,7 +32,7 @@ var gameData = {
     worldPath: 'scrambled-shade/shade_backround.jpg',
     helpPath: 'scrambled-shade/shade_instructions.png',
     winText: 'You sure made the hens had shelter out of the hot sun',
-    loseText: 'You didn\'d give the hens enough shade out of the hot sun',
+    loseText: 'You didn\'t give the hens enough shade out of the hot sun',
     player: null
   }
 }
@@ -42,13 +53,13 @@ export default class ContainerScene extends Phaser.Scene {
     let screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
 
     let testText = this.add.text(screenCenterX, 200, '', {
-      wordWrap: { width: 1200, useAdvancedWrap: true, fontFamily: 'Toriga', font: 'Toriga' }
+      wordWrap: { width: 1200, useAdvancedWrap: true, font: 'Toriga' }
     });
     testText.setOrigin(0.5);
     testText.setColor('#00a0e0');
 
     loadingText = this.add.text(screenCenterX, 450, 'Loading...', {
-      wordWrap: { width: 1200, useAdvancedWrap: true }
+      wordWrap: { width: 1200, useAdvancedWrap: true, font: 'Toriga' }
     });
     loadingText.setOrigin(0.5);
     loadingText.setColor('#00a0e0');

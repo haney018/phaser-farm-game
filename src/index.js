@@ -2,6 +2,7 @@ import './styles/style.css'
 
 import Phaser from 'phaser';
 import ContainerScene from './scenes/containerScene';
+import GameSunny from './scenes/gameSunny';
 import GameFowl from './scenes/gameFowl';
 import GameScrambled from './scenes/gameScrambled';
 import StartScene from './scenes/startScene';
@@ -27,6 +28,7 @@ const config = {
   },
   scene: [
     ContainerScene,
+    GameSunny,
     GameFowl,
     GameScrambled,
     StartScene,

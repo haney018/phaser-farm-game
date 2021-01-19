@@ -18,9 +18,15 @@ export default class LoseScene extends Phaser.Scene {
     this.load.image('char1-lose', require(`../assets/gen_eggsplore_try.png`));
     this.load.image('restartButton-lose', require('../assets/btn_restart.png'));
     this.load.image('exitButton-lose', require('../assets/btn_exit.png'));
+
+    // this.load.setPath('../assets/audio');
+    this.load.audio('try-again', [ require(`../assets/audio/try-again/try-again.wav`), require(`../assets/audio/try-again/try-again.mp3`) ]);
   }
 
   create() {
+    let tryAgain = this.sound.add('try-again');
+    tryAgain.play();
+    
     let modal = this.add.image(0, 0, 'modal-lose');
     modal.setOrigin(0, 0);
 
@@ -111,6 +117,8 @@ export default class LoseScene extends Phaser.Scene {
         }
       });
     });
+
+    
   }
 
   update() {}
