@@ -24,6 +24,7 @@ var hasPower = false;
 var driverLevel = 0;
 var collider_p2c = true;
 var collider_p2f = true;
+var sounds = {};
 
 export default class GameSunny extends Phaser.Scene {
   constructor () {
@@ -52,6 +53,11 @@ export default class GameSunny extends Phaser.Scene {
     countDown;
     timeLimitSec = 121;
     timer;
+    if (panelData) {
+      for (let i = 0; i < panelData.length; i++) {
+        if (panelData[i].timer) clearInterval(panelData[i].timer)
+      }
+    }
     panelData = [
       { x: 20, y: 230, value: 0, selected: false, bar: null, interactable: false, isOn: false, timer: null },
       { x: 710, y: 230, value: 0, selected: false, bar: null, interactable: false, isOn: false, timer: null },
@@ -69,6 +75,7 @@ export default class GameSunny extends Phaser.Scene {
     driverLevel = 0;
     collider_p2c = true;
     collider_p2f = true;
+    this.turnOffSounds();
   }
 
   preload() {
@@ -91,6 +98,20 @@ export default class GameSunny extends Phaser.Scene {
     this.load.image("pauseButton", require('../assets/btn_pause.png'));
     this.load.image("timerBlob", require('../assets/gen_timerblob.png'));
 
+    this.load.audio('click', require(`../assets/audio/button/button.mp3`));
+    this.load.audio('hover', require(`../assets/audio/button/hover.mp3`));
+    this.load.audio('walk', require(`../assets/audio/character/walk.mp3`));
+    this.load.audio('honk', require(`../assets/audio/honking/honking.wav`));
+    this.load.audio('conveyorSound', require(`../assets/audio/conveyor/conveyor.wav`));
+    this.load.audio('onSound', [
+      require(`../assets/audio/switch-button/switch-on.wav`),
+      require(`../assets/audio/switch-button/switch-on.mp3`),
+    ]);
+    this.load.audio('offSound', [
+      require(`../assets/audio/switch-button/switch-off.wav`),
+      require(`../assets/audio/switch-button/switch-off.mp3`),
+    ]);
+
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.spaceBar.on('down', () => { 
       this.spaceBarDown = true 
@@ -109,6 +130,7 @@ export default class GameSunny extends Phaser.Scene {
   }
 
   create() {
+    this.createSounds();
     this.createField();
     this.createInteractableObjects();
     this.createPlayer();
@@ -118,8 +140,21 @@ export default class GameSunny extends Phaser.Scene {
     this.createGamepad();
     
     this.createTimers();
-    // this.scene.pause();
-    // this.scene.launch('StartScene', { gameId: 'fowl' });
+  }
+
+  createSounds() {
+    sounds.clickSound = this.sound.add('click');
+    sounds.hoverSound = this.sound.add('hover');
+    sounds.hoverSound = this.sound.add('hover');
+    sounds.hoverSound.volume = 0.2
+    sounds.onSound = this.sound.add('onSound');
+    sounds.offSound = this.sound.add('offSound');
+    sounds.walkSound = this.sound.add('walk');
+    sounds.walkSound.loop = true
+    sounds.walkSound.volume = 0.2
+    sounds.honkSound = this.sound.add('honk');
+    sounds.conveyorSound = this.sound.add('conveyorSound');
+    sounds.conveyorSound.loop = true
   }
 
   createField() {
@@ -329,6 +364,7 @@ export default class GameSunny extends Phaser.Scene {
     pauseButton.setInteractive( { useHandCursor: true  } );
 
     pauseButton.on('pointerover', () => {
+      sounds.hoverSound.play();
       this.tweens.add({
         targets: pauseButton,
         scale: { value: 1.1, duration: 100, ease: 'Power1' },
@@ -348,6 +384,7 @@ export default class GameSunny extends Phaser.Scene {
         targets: pauseButton,
         scale: { value: 0.9, duration: 100, ease: 'Power1' },
         onComplete: () => {
+          sounds.clickSound.play();
           this.scene.launch('PauseScene', gameData);
           this.scene.pause();
         }
@@ -387,6 +424,7 @@ export default class GameSunny extends Phaser.Scene {
     if (timeLimitSec === 0) {
       this.scene.launch('WinnerScene', gameData);
       this.scene.pause();
+      this.turnOffSounds();
     }
   }
 
@@ -464,7 +502,7 @@ export default class GameSunny extends Phaser.Scene {
     // this.actionLabel.setColor('#00a0e0');
     this.actionGroup.add(this.actionLabel)
 
-    this.actionGroup.setAlpha(0.1);
+    this.actionGroup.setVisible(false);
   }
 
   interactOne(player, coop) {
@@ -475,37 +513,39 @@ export default class GameSunny extends Phaser.Scene {
     if (this.spaceBarDown || this.isActionPad) {
       if (collider_p2c && panelData[index].interactable) {
         collider_p2c = false
+        sounds.onSound.play();
 
-          let currentValue = panelData[index].value
-          let sec = 0
-          let deduction = panelData[index].value / (solarTime / intervalTime);
+        let currentValue = panelData[index].value
+        let sec = 0
+        let deduction = panelData[index].value / (solarTime / intervalTime);
 
-          driverLevel = driverLevel - 10
-          playerData.isInteracting = true;
-          playerData.interactType = 'p2c';
-          panelData[index].isOn = true
-          panelData[index].timer = null
-          panelGroup.children.entries[index].anims.play('panel-on', true)
+        driverLevel = driverLevel - 10
+        playerData.isInteracting = true;
+        playerData.interactType = 'p2c';
+        panelData[index].isOn = true
+        panelData[index].timer = null
+        panelGroup.children.entries[index].anims.play('panel-on', true)
+         
+        panelData[index].timer = setInterval(() => {
+          sec = sec + intervalTime
+          panelData[index].value = panelData[index].value - deduction
           
-          panelData[index].timer = setInterval(() => {
-            sec = sec + intervalTime
-            panelData[index].value = panelData[index].value - deduction
-            
-            if (sec === processTime) {
-              playerData.isInteracting = false;
-              playerData.interactType = null;
-            }
+          if (sec === processTime) {
+            playerData.isInteracting = false;
+            playerData.interactType = null;
+          }
 
-            if (sec > solarTime) {
-              panelGroup.children.entries[index].anims.play('panel-turn-off', true)
-              clearInterval(panelData[index].timer)
-              setTimeout(() => {
-                panelData[index].value = 0;
-                panelData[index].isOn = false
-              }, 2000)
-              
-            }
-          }, intervalTime);
+          if (sec > solarTime) {
+            panelGroup.children.entries[index].anims.play('panel-turn-off', true)
+            clearInterval(panelData[index].timer)
+            setTimeout(() => {
+              sounds.offSound.play();
+              panelData[index].value = 0;
+              panelData[index].isOn = false
+            }, 2000)
+             
+          }
+        }, intervalTime);
       }
     }
   }
@@ -540,6 +580,9 @@ export default class GameSunny extends Phaser.Scene {
             this.driverTimer.remove();
             this.scene.launch('LoseScene', gameData);
             this.scene.pause();
+            this.turnOffSounds();
+          } else if (driverLevel >= 60) {
+            sounds.honkSound.play();
           }
         }
       },
@@ -563,7 +606,7 @@ export default class GameSunny extends Phaser.Scene {
       this.downDpad.visible = false;
       this.leftDpad.visible = false;
       this.rightDpad.visible = false;
-      this.actionGroup.visible = false;
+      this.actionGroup.setVisible(false);
     }
     else{
       this.dpad.visible = true;
@@ -572,13 +615,14 @@ export default class GameSunny extends Phaser.Scene {
       this.leftDpad.visible = true;
       this.rightDpad.visible = true;
       this.actionGroup.visible = true;
-    }
+      this.actionGroup.setVisible(true);
 
-    let hasSelected = panelData.filter(val => val.selected)
-    if (hasSelected.length) {
-      this.actionGroup.setAlpha(0.8);
-    } else {
-      this.actionGroup.setAlpha(0.1);
+      let hasSelected = panelData.filter(val => val.selected)
+      if (hasSelected.length) {
+        this.actionGroup.setAlpha(0.8);
+      } else {
+        this.actionGroup.setAlpha(0.1);
+      }
     }
   }
 
@@ -590,18 +634,23 @@ export default class GameSunny extends Phaser.Scene {
       }
     } else {
       if (this.cursors.right.isDown || this.wasd.right.isDown || this.isRightPad) {
+        if (!sounds.walkSound.isPlaying) sounds.walkSound.play();
         player.setVelocityX(moveSpeed);
         playerData.value ? player.anims.play('right-bucket', true) : player.anims.play('right', true);
       } else if (this.cursors.left.isDown || this.wasd.left.isDown || this.isLeftPad) {
+        if (!sounds.walkSound.isPlaying) sounds.walkSound.play();
         player.setVelocityX(-moveSpeed);
         playerData.value ? player.anims.play('left-bucket', true) : player.anims.play('left', true);
       } else if (this.cursors.down.isDown || this.wasd.down.isDown || this.isDownPad) {
+        if (!sounds.walkSound.isPlaying) sounds.walkSound.play();
         player.setVelocityY(moveSpeed);
         playerData.value ? player.anims.play('down-bucket', true) : player.anims.play('down', true);
       } else if (this.cursors.up.isDown || this.wasd.up.isDown || this.isUpPad) {
+        if (!sounds.walkSound.isPlaying) sounds.walkSound.play();
         player.setVelocityY(-moveSpeed);
         playerData.value ? player.anims.play('up-bucket', true) : player.anims.play('up', true);
       } else {
+        sounds.walkSound.stop();
         playerData.value ? player.anims.play('turn-bucket') : player.anims.play('turn');
       }
     }
@@ -684,8 +733,11 @@ export default class GameSunny extends Phaser.Scene {
     hasPower = panelOn.length ? true : false
     if (hasPower) {
       this.convCollider.children.entries[0].anims.play('conveyor-run', true)
+      if (!sounds.conveyorSound.isPlaying) sounds.conveyorSound.play();
+      // if (sounds)
     } else {
       this.convCollider.children.entries[0].anims.pause()
+      sounds.conveyorSound.stop();
     }
 
     if (driverLevel >= 60) {
@@ -722,5 +774,11 @@ export default class GameSunny extends Phaser.Scene {
 
     panelData[i].bar.fillRect(x, y, value, 10);
     this.add.existing(panelData[i].bar);
+  }
+
+  turnOffSounds() {
+    for (var key in sounds) {
+      sounds[key].stop();
+    }
   }
 }

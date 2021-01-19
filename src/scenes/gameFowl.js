@@ -10,7 +10,7 @@ var playerData = {
   interactZone: null
 };
 var processTime = 1000;
-var progressTime = 2500;
+var progressTime = 3000;
 var moveSpeed = 400;
 var pauseButton;
 var countDown;
@@ -19,6 +19,7 @@ var timer;
 var coopListData;
 var collider_p2c = true;
 var collider_p2f = true;
+var sounds = {};
 
 export default class GameFowl extends Phaser.Scene {
   constructor () {
@@ -48,21 +49,22 @@ export default class GameFowl extends Phaser.Scene {
     timeLimitSec = 121;
     timer;
     coopListData = [
-      { x: 580, y: 30, value: 0, selected: false, bar: null },
-      { x: 930, y: 30, value: 0, selected: false, bar: null },
+      { x: 580, y: 30, value: 70, selected: false, bar: null, interactable: true },
+      { x: 930, y: 30, value: 0, selected: false, bar: null, interactable: true },
     
-      { x: 130, y: 350, value: 0, selected: false, bar: null },
-      { x: 480, y: 350, value: 0, selected: false, bar: null },
-      { x: 1050, y: 350, value: 0, selected: false, bar: null },
-      { x: 1400, y: 350, value: 0, selected: false, bar: null },
+      { x: 130, y: 350, value: 20, selected: false, bar: null, interactable: true },
+      { x: 480, y: 350, value: 0, selected: false, bar: null, interactable: true },
+      { x: 1050, y: 350, value: 0, selected: false, bar: null, interactable: true },
+      { x: 1400, y: 350, value: 0, selected: false, bar: null, interactable: true },
     
-      { x: 130, y: 650, value: 0, selected: false, bar: null },
-      { x: 480, y: 650, value: 0, selected: false, bar: null },
-      { x: 1050, y: 650, value: 0, selected: false, bar: null },
-      { x: 1400, y: 650, value: 0, selected: false, bar: null }
+      { x: 130, y: 650, value: 0, selected: false, bar: null, interactable: true },
+      { x: 480, y: 650, value: 0, selected: false, bar: null, interactable: true },
+      { x: 1050, y: 650, value: 20, selected: false, bar: null, interactable: true },
+      { x: 1400, y: 650, value: 0, selected: false, bar: null, interactable: true }
     ];
     collider_p2c = true;
     collider_p2f = true;
+    this.turnOffSounds();
   }
 
   preload() {
@@ -70,7 +72,7 @@ export default class GameFowl extends Phaser.Scene {
     this.load.image('world-end-top', require('../assets/fowl-fertilizer/fowlbg_cutout.png'));
     this.load.image('world-end-side', require('../assets/fowl-fertilizer/fowlhaystacks.png'));
 
-    this.load.spritesheet('coop', require('../assets/fowl-fertilizer/coop1_ss_complete.png'), { frameWidth: 400, frameHeight: 290 });
+    this.load.spritesheet('coop', require('../assets/fowl-fertilizer/coop1_ss.png'), { frameWidth: 400, frameHeight: 290 });
 
     this.load.spritesheet('eggsplain', require('../assets/eggsplain_ss.png'), { frameWidth: 300.75, frameHeight: 341 });
     this.load.spritesheet('eggsplore', require('../assets/eggsplore_ss.png'), { frameWidth: 300.75, frameHeight: 341 });
@@ -85,6 +87,15 @@ export default class GameFowl extends Phaser.Scene {
 
     this.load.image("pauseButton", require('../assets/btn_pause.png'));
     this.load.image("timerBlob", require('../assets/gen_timerblob.png'));
+
+    this.load.audio('click', require(`../assets/audio/button/button.mp3`));
+    this.load.audio('hover', require(`../assets/audio/button/hover.mp3`));
+    this.load.audio('walk', require(`../assets/audio/character/walk.mp3`));
+    this.load.audio('flySound', require(`../assets/audio/fowl-flies/flySound.wav`));
+    this.load.audio('splat1', require(`../assets/audio/fowl-splat/splat1.wav`));
+    this.load.audio('splat2', require(`../assets/audio/fowl-splat/splat2.wav`));
+    this.load.audio('cluck', require(`../assets/audio/chicken/cluck.wav`));
+
 
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.spaceBar.on('down', () => { 
@@ -104,6 +115,7 @@ export default class GameFowl extends Phaser.Scene {
   }
 
   create() {
+    this.createSounds();
     this.createField();
     this.createInteractableObjects();
     this.createPlayer();
@@ -115,6 +127,19 @@ export default class GameFowl extends Phaser.Scene {
     this.createTimers();
     // this.scene.pause();
     // this.scene.launch('StartScene', { gameId: 'fowl' });
+  }
+
+  createSounds() {
+    sounds.clickSound = this.sound.add('click');
+    sounds.hoverSound = this.sound.add('hover');
+    sounds.hoverSound.volume = 0.2
+    sounds.walkSound = this.sound.add('walk');
+    sounds.walkSound.loop = true
+    sounds.walkSound.volume = 0.2
+    sounds.splat1Sound = this.sound.add('splat1');
+    sounds.splat2Sound = this.sound.add('splat2');
+    sounds.flySound = this.sound.add('flySound');
+    sounds.cluckSound = this.sound.add('cluck');
   }
 
   createField() {
@@ -394,6 +419,7 @@ export default class GameFowl extends Phaser.Scene {
     pauseButton.setInteractive( { useHandCursor: true  } );
 
     pauseButton.on('pointerover', () => {
+      sounds.hoverSound.play();
       this.tweens.add({
         targets: pauseButton,
         scale: { value: 1.1, duration: 100, ease: 'Power1' },
@@ -413,6 +439,7 @@ export default class GameFowl extends Phaser.Scene {
         targets: pauseButton,
         scale: { value: 0.9, duration: 100, ease: 'Power1' },
         onComplete: () => {
+          sounds.clickSound.play();
           this.scene.launch('PauseScene', gameData);
           this.scene.pause();
         }
@@ -450,6 +477,7 @@ export default class GameFowl extends Phaser.Scene {
 
     countDown.setText(minutes+':'+seconds);
     if (timeLimitSec === 0) {
+      this.turnOffSounds();
       this.scene.launch('WinnerScene', gameData);
       this.scene.pause();
     }
@@ -539,26 +567,31 @@ export default class GameFowl extends Phaser.Scene {
 
     this.activeIndex = index
     if (this.spaceBarDown || this.isActionPad) {
-      if (collider_p2c) {
+      if (collider_p2c && coopListData[index].interactable && coopListData[index].value >= 10) {
         collider_p2c = false
+        coopListData[index].interactable = false
 
         let currentValue = coopListData[index].value
-        if (currentValue >= 2 && playerData.value === 0) {
+        if (currentValue >= 2 && playerData.value < 100) {
           let sec = 0
           let deduction = coopListData[index].value / (processTime / intervalTime);
           playerData.isInteracting = true;
           playerData.interactType = 'p2c';
+          sounds.cluckSound.play();
 
           timer = setInterval(() => {
             sec = sec + intervalTime
-            coopListData[index].value = coopListData[index].value - deduction
-            playerData.value = playerData.value + ((100 * intervalTime) / processTime);
-            if (sec > processTime) {
+            if (sec > processTime || playerData.value >= 100) {
+              sounds.cluckSound.stop();
+              sounds.splat1Sound.play();
+              coopListData[index].interactable = true
               playerData.isInteracting = false;
               playerData.interactType = null;
-              coopListData[index].value = 5;
-              playerData.value = 100;
               clearInterval(timer)
+            } else {
+              let playerValue = playerData.value + deduction
+              coopListData[index].value = coopListData[index].value - deduction
+              playerData.value = playerValue >= 100 ? 100 : playerValue;
             }
           }, intervalTime);
         }
@@ -574,17 +607,20 @@ export default class GameFowl extends Phaser.Scene {
       if (collider_p2f) {
         collider_p2f = false
 
-        if (playerData.value === 100) {
+        if (playerData.value <= 100 && playerData.value > 0) {
           let sec = 0
           let deduction = playerData.value / (processTime / intervalTime);
 
           playerData.isInteracting = true;
           playerData.interactType = 'p2f';
+          sounds.flySound.play();
 
           timer = setInterval(() => {
             sec = sec + intervalTime
             playerData.value = playerData.value - deduction
             if (sec > processTime) {
+              sounds.flySound.stop();
+              sounds.splat2Sound.play();
               playerData.isInteracting = false;
               playerData.interactType = null;
               playerData.value = 0
@@ -602,15 +638,20 @@ export default class GameFowl extends Phaser.Scene {
       callback: () => {
         for (let i = 0; i < coopListData.length; i++) {
           let random;
-          if (coopListData[i].value > 80) {
-            random = Math.floor(Math.random() *  Math.floor(10));
+          if (coopListData[i].value < 80) {
+            random = Math.floor(Math.random() *  Math.floor(8));
           } else {
-            random = Math.floor(Math.random() *  Math.floor(5));
+            random = Math.floor(Math.random() *  Math.floor(3));
           }
-          coopListData[i].value = coopListData[i].value + random;
+
+          if (coopListData[i].interactable) {
+            coopListData[i].value = coopListData[i].value + random;
+          }
+          
           if (coopListData[i].value >= 100) {
             coopListData[i].value = 100;
             this.coopTimer.remove();
+            this.turnOffSounds();
             this.scene.launch('LoseScene', gameData);
             this.scene.pause();
           }
@@ -629,10 +670,6 @@ export default class GameFowl extends Phaser.Scene {
     });
   }
 
-  run() {
-    console.log('asdas')
-  }
-
   update() {
     this.updateGamepad();
     this.updatePlayerMovement();
@@ -649,6 +686,7 @@ export default class GameFowl extends Phaser.Scene {
       this.leftDpad.visible = false;
       this.rightDpad.visible = false;
       this.actionGroup.visible = false;
+      this.actionGroup.setVisible(false);
     }
     else{
       this.dpad.visible = true;
@@ -657,19 +695,22 @@ export default class GameFowl extends Phaser.Scene {
       this.leftDpad.visible = true;
       this.rightDpad.visible = true;
       this.actionGroup.visible = true;
+      this.actionGroup.setVisible(true);
+
+      let hasSelected = coopListData.filter(val => val.selected)
+      let boundsA = playerData.interactZone.getBounds();
+      let boundsB = this.fertOverlap.children.entries[0].getBounds();
+      let inFertilizer = Phaser.Geom.Intersects.RectangleToRectangle(boundsA, boundsB)
+
+      if (hasSelected.length || inFertilizer) {
+        this.actionLabel.setText(inFertilizer ? ' Empty ' : 'Collect')
+        this.actionGroup.setAlpha(0.6);
+      } else {
+        this.actionGroup.setAlpha(0.1);
+      }
     }
 
-    let hasSelected = coopListData.filter(val => val.selected)
-    let boundsA = playerData.interactZone.getBounds();
-    let boundsB = this.fertOverlap.children.entries[0].getBounds();
-    let inFertilizer = Phaser.Geom.Intersects.RectangleToRectangle(boundsA, boundsB)
-
-    if (hasSelected.length || inFertilizer) {
-      this.actionLabel.setText(inFertilizer ? ' Empty ' : 'Collect')
-      this.actionGroup.setAlpha(0.6);
-    } else {
-      this.actionGroup.setAlpha(0.1);
-    }
+    
   }
 
   updatePlayerMovement() {
@@ -682,18 +723,23 @@ export default class GameFowl extends Phaser.Scene {
       }
     } else {
       if (this.cursors.right.isDown || this.wasd.right.isDown || this.isRightPad) {
+        if (!sounds.walkSound.isPlaying) sounds.walkSound.play();
         player.setVelocityX(moveSpeed);
         playerData.value ? player.anims.play('right-bucket', true) : player.anims.play('right', true);
       } else if (this.cursors.left.isDown || this.wasd.left.isDown || this.isLeftPad) {
+        if (!sounds.walkSound.isPlaying) sounds.walkSound.play();
         player.setVelocityX(-moveSpeed);
         playerData.value ? player.anims.play('left-bucket', true) : player.anims.play('left', true);
       } else if (this.cursors.down.isDown || this.wasd.down.isDown || this.isDownPad) {
+        if (!sounds.walkSound.isPlaying) sounds.walkSound.play();
         player.setVelocityY(moveSpeed);
         playerData.value ? player.anims.play('down-bucket', true) : player.anims.play('down', true);
       } else if (this.cursors.up.isDown || this.wasd.up.isDown || this.isUpPad) {
+        if (!sounds.walkSound.isPlaying) sounds.walkSound.play();
         player.setVelocityY(-moveSpeed);
         playerData.value ? player.anims.play('up-bucket', true) : player.anims.play('up', true);
       } else {
+        sounds.walkSound.stop();
         playerData.value ? player.anims.play('turn-bucket') : player.anims.play('turn');
       }
     }
@@ -703,11 +749,12 @@ export default class GameFowl extends Phaser.Scene {
   }
 
   updatePlayerBar() {
-    if (playerData.isInteracting) {
-      this.redrawPlayerBar(player.x - 45, player.y - 100, playerData.value);
-    } else {
-      playerBar.clear();
-    }
+    this.redrawPlayerBar(player.x - 45, player.y - 100, playerData.value);
+    // if (playerData.isInteracting) {
+    //   this.redrawPlayerBar(player.x - 45, player.y - 100, playerData.value);
+    // } else {
+    //   playerBar.clear();
+    // }
   }
 
   redrawPlayerBar(x, y, value) {
@@ -717,9 +764,9 @@ export default class GameFowl extends Phaser.Scene {
     playerBar.fillStyle(0x00a0e0);
     playerBar.fillRect(x - 3, y - 3, 106, 16);
 
-    if (value > 80) {
+    if (value === 100) {
       playerBar.fillStyle(0xec1c25, 1);
-    } else if (value > 40 && value <= 80) {
+    } else if (value > 40 && value < 100) {
       playerBar.fillStyle(0xffb71b, 1);
     } else {
       playerBar.fillStyle(0xffb71b, 1);
@@ -784,5 +831,11 @@ export default class GameFowl extends Phaser.Scene {
 
     coopListData[i].bar.fillRect(x, y, value, 20);
     this.add.existing(coopListData[i].bar);
+  }
+
+  turnOffSounds() {
+    for (var key in sounds) {
+      sounds[key].stop();
+    }
   }
 }

@@ -1,5 +1,6 @@
 // import bg from '../assets/background.png';
 var gameData;
+var sounds = {};
 
 export default class StartScene extends Phaser.Scene {
   constructor () {
@@ -15,14 +16,16 @@ export default class StartScene extends Phaser.Scene {
     this.load.image('title', require(`../assets/${introPath}`));
     this.load.image('startButton', require('../assets/btn_start.png'));
 
-    // this.load.setPath('../assets/audio');
-    this.load.audio('try-again', [ require(`../assets/audio/try-again/try-again.wav`), require(`../assets/audio/try-again/try-again.mp3`) ]);
+    this.load.audio('click', require(`../assets/audio/button/button.mp3`));
+    this.load.audio('hover', require(`../assets/audio/button/hover.mp3`));
   }
 
   create() {
-    
-    
     const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
+
+    sounds.clickSound = this.sound.add('click');
+    sounds.hoverSound = this.sound.add('hover');
+    sounds.hoverSound.volume = 0.2
     
     let title = this.add.image(0, 0, 'title');
     title.setOrigin(0, 0);
@@ -32,6 +35,7 @@ export default class StartScene extends Phaser.Scene {
     this.startButton.setInteractive( { useHandCursor: true  } );
 
     this.startButton.on('pointerover', () => {
+      sounds.hoverSound.play();
       this.tweens.add({
         targets: this.startButton,
         scale: { value: 1.1, duration: 100, ease: 'Power1' },
@@ -51,17 +55,15 @@ export default class StartScene extends Phaser.Scene {
         targets: this.startButton,
         scale: { value: 0.9, duration: 100, ease: 'Power1' },
         onComplete: () => {
+          sounds.clickSound.play();
+
           this.scene.launch('HelpScene', gameData);
           this.scene.stop();
+
         }
       });
       
     })
-
-    
-    console.log(this.tweens)
-    let tryAgain = this.sound.add('try-again');
-    tryAgain.play();
   }
 
   update() {}

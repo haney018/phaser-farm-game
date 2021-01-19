@@ -13,6 +13,7 @@ var chickenGroupData;
 var chickenTypes;
 var collider_p2c = true;
 var collider_p2f = true;
+var sounds = {};
 
 export default class GameScrambled extends Phaser.Scene {
   constructor () {
@@ -63,6 +64,7 @@ export default class GameScrambled extends Phaser.Scene {
     collider_p2c = true;
     collider_p2f = true;
     this.randomizeAll();
+    this.turnOffSounds();
   }
 
   randomizeAll() {
@@ -125,6 +127,7 @@ export default class GameScrambled extends Phaser.Scene {
   }
 
   create() {
+    this.createSounds();
     this.createField();
     this.createInteractableObjects();
     this.createPlayer();
@@ -136,6 +139,19 @@ export default class GameScrambled extends Phaser.Scene {
     this.createTimers();
     // this.scene.pause();
     // this.scene.launch('StartScene', { gameId: 'fowl' });
+  }
+
+  createSounds() {
+    sounds.clickSound = this.sound.add('click');
+    sounds.hoverSound = this.sound.add('hover');
+    sounds.hoverSound.volume = 0.2
+    sounds.walkSound = this.sound.add('walk');
+    sounds.walkSound.loop = true
+    sounds.walkSound.volume = 0.2
+    sounds.splat1Sound = this.sound.add('splat1');
+    sounds.splat2Sound = this.sound.add('splat2');
+    sounds.flySound = this.sound.add('flySound');
+    sounds.cluckSound = this.sound.add('cluck');
   }
 
   createField() {
@@ -543,6 +559,7 @@ export default class GameScrambled extends Phaser.Scene {
 
     countDown.setText(minutes+':'+seconds);
     if (timeLimitSec === 0) {
+      this.turnOffSounds();
       this.scene.launch('WinnerScene', gameData);
       this.scene.pause();
     }
@@ -775,15 +792,16 @@ export default class GameScrambled extends Phaser.Scene {
       callback: () => {
         for (let i = 0; i < chickenGroupData.length; i++) {
           let random;
-          if (chickenGroupData[i].value > 80) {
-            random = Math.floor(Math.random() *  Math.floor(10));
+          if (chickenGroupData[i].value < 80) {
+            random = Math.floor(Math.random() *  Math.floor(9));
           } else {
-            random = Math.floor(Math.random() *  Math.floor(5));
+            random = Math.floor(Math.random() *  Math.floor(3));
           }
           chickenGroupData[i].value = chickenGroupData[i].value + random;
           if (chickenGroupData[i].value >= 100) {
             chickenGroupData[i].value = 100;
             this.coopTimer.remove();
+            this.turnOffSounds();
             this.scene.launch('LoseScene', gameData);
             this.scene.pause();
           }
@@ -822,6 +840,7 @@ export default class GameScrambled extends Phaser.Scene {
       this.leftDpad.visible = false;
       this.rightDpad.visible = false;
       this.actionGroup.visible = false;
+      this.actionGroup.setVisible(false);
     }
     else{
       this.dpad.visible = true;
@@ -830,14 +849,17 @@ export default class GameScrambled extends Phaser.Scene {
       this.leftDpad.visible = true;
       this.rightDpad.visible = true;
       this.actionGroup.visible = true;
+      this.actionGroup.setVisible(true);
+
+      let hasSelected = chickenGroupData.filter(val => val.selected)
+      if (hasSelected.length) {
+        this.actionGroup.setAlpha(0.5);
+      } else {
+        this.actionGroup.setAlpha(0.1);
+      }
     }
 
-    let hasSelected = chickenGroupData.filter(val => val.selected)
-    if (hasSelected.length) {
-      this.actionGroup.setAlpha(0.5);
-    } else {
-      this.actionGroup.setAlpha(0.1);
-    }
+    
   }
 
   updatePlayerMovement() {
@@ -982,5 +1004,11 @@ export default class GameScrambled extends Phaser.Scene {
 
     chickenGroupData[i].bar.fillRect(x, y, value, 20);
     this.add.existing(chickenGroupData[i].bar);
+  }
+
+  turnOffSounds() {
+    for (var key in sounds) {
+      sounds[key].stop();
+    }
   }
 }

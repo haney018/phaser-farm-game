@@ -2,6 +2,7 @@
 var gameData;
 var restartButton;
 var exitButton;
+var sounds = {};
 
 export default class WinnerScene extends Phaser.Scene {
   constructor () {
@@ -20,13 +21,17 @@ export default class WinnerScene extends Phaser.Scene {
     this.load.image('restartButton', require('../assets/btn_restart.png'));
     this.load.image('exitButton', require('../assets/btn_exit.png'));
 
-    this.load.audio('winner', require(`../assets/audio/try-again/winner.wav`));
-
+    this.load.audio('winner', require(`../assets/audio/winner/winner.wav`));
+    this.load.audio('click', require(`../assets/audio/button/button.mp3`));
+    this.load.audio('hover', require(`../assets/audio/button/hover.mp3`));
   }
 
   create() {
-    let winner = this.sound.add('winner');
-    winner.play();
+    sounds.clickSound = this.sound.add('click');
+    sounds.hoverSound = this.sound.add('hover');
+    sounds.hoverSound.volume = 0.2
+    sounds.winnerSound = this.sound.add('winner');
+    sounds.winnerSound.play();
 
     let modal = this.add.image(0, 0, 'modal');
     modal.setOrigin(0, 0);
@@ -63,6 +68,7 @@ export default class WinnerScene extends Phaser.Scene {
     restartButton.setOrigin(0.5);
     restartButton.setInteractive( { useHandCursor: true  } );
     restartButton.on('pointerover', () => {
+      sounds.hoverSound.play();
       this.tweens.add({
         targets: restartButton,
         scale: { value: 1.1, duration: 100, ease: 'Power1' },
@@ -81,6 +87,7 @@ export default class WinnerScene extends Phaser.Scene {
         targets: restartButton,
         scale: { value: 0.9, duration: 100, ease: 'Power1' },
         onComplete: () => {
+          sounds.clickSound.play();
           let currentScene = this.scene.get(gameData.sceneName);
           currentScene.scene.restart();
           this.scene.stop();
@@ -92,6 +99,7 @@ export default class WinnerScene extends Phaser.Scene {
     exitButton.setOrigin(0.5);
     exitButton.setInteractive( { useHandCursor: true  } );
     exitButton.on('pointerover', () => {
+      sounds.hoverSound.play();
       this.tweens.add({
         targets: exitButton,
         scale: { value: 1.1, duration: 100, ease: 'Power1' },
@@ -110,6 +118,7 @@ export default class WinnerScene extends Phaser.Scene {
         targets: exitButton,
         scale: { value: 0.9, duration: 100, ease: 'Power1' },
         onComplete: () => {
+          sounds.clickSound.play();
           let currentScene = this.scene.get('ContainerScene');
           currentScene.scene.restart();
           this.scene.stop(gameData.sceneName);

@@ -1,4 +1,4 @@
-var activeGameId = 'sunny';
+var activeGameId = 'fowl';
 var counter = 0;
 var loadingText;
 var gameData = {
@@ -44,6 +44,7 @@ export default class ContainerScene extends Phaser.Scene {
 
   preload() {
     this.load.image('world', require(`../assets/${gameData[activeGameId].worldPath}`));
+    this.load.audio('farm-music', [require(`../assets/audio/farm-music/a-little-farm.wav`), require(`../assets/audio/farm-music/a-little-farm.mp3`)]);
   }
 
   create() {
@@ -68,12 +69,21 @@ export default class ContainerScene extends Phaser.Scene {
     loadingText.setAlign('center');
 
     this.scene.launch('StartScene', gameData[activeGameId]);
+
+    this.time.addEvent({
+      delay: 1500,
+      callback: () => {
+        let music = this.sound.add('farm-music');
+        music.loop = true
+        music.volume = 0.2
+        music.play();
+      },
+    });
   }
 
   update() {
-    // loadingText.setFontFamily('Toriga');
     this.time.addEvent({
-      delay: 1000,                // ms
+      delay: 1000,
       callback: () => {
         loadingText.setFontFamily('Toriga');
 

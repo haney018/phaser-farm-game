@@ -2,6 +2,7 @@
 var gameData;
 var restartButton;
 var exitButton;
+var sounds = {}
 
 export default class LoseScene extends Phaser.Scene {
   constructor () {
@@ -21,12 +22,17 @@ export default class LoseScene extends Phaser.Scene {
 
     // this.load.setPath('../assets/audio');
     this.load.audio('try-again', [ require(`../assets/audio/try-again/try-again.wav`), require(`../assets/audio/try-again/try-again.mp3`) ]);
+    this.load.audio('click', require(`../assets/audio/button/button.mp3`));
+    this.load.audio('hover', require(`../assets/audio/button/hover.mp3`));
   }
 
   create() {
-    let tryAgain = this.sound.add('try-again');
-    tryAgain.play();
-    
+    sounds.clickSound = this.sound.add('click');
+    sounds.hoverSound = this.sound.add('hover');
+    sounds.hoverSound.volume = 0.2
+    sounds.loseSound = this.sound.add('try-again');
+    sounds.loseSound.play();
+
     let modal = this.add.image(0, 0, 'modal-lose');
     modal.setOrigin(0, 0);
 
@@ -62,6 +68,7 @@ export default class LoseScene extends Phaser.Scene {
     restartButton.setOrigin(0.5);
     restartButton.setInteractive( { useHandCursor: true  } );
     restartButton.on('pointerover', () => {
+      sounds.hoverSound.play();
       this.tweens.add({
         targets: restartButton,
         scale: { value: 1.1, duration: 100, ease: 'Power1' },
@@ -80,6 +87,7 @@ export default class LoseScene extends Phaser.Scene {
         targets: restartButton,
         scale: { value: 0.9, duration: 100, ease: 'Power1' },
         onComplete: () => {
+          sounds.clickSound.play();
           let currentScene = this.scene.get(gameData.sceneName);
           currentScene.scene.restart();
           this.scene.stop();
@@ -91,6 +99,7 @@ export default class LoseScene extends Phaser.Scene {
     exitButton.setOrigin(0.5);
     exitButton.setInteractive( { useHandCursor: true  } );
     exitButton.on('pointerover', () => {
+      sounds.hoverSound.play();
       this.tweens.add({
         targets: exitButton,
         scale: { value: 1.1, duration: 100, ease: 'Power1' },
@@ -109,6 +118,7 @@ export default class LoseScene extends Phaser.Scene {
         targets: exitButton,
         scale: { value: 0.9, duration: 100, ease: 'Power1' },
         onComplete: () => {
+          sounds.clickSound.play();
           let currentScene = this.scene.get('ContainerScene');
           currentScene.scene.restart();
           this.scene.stop(gameData.sceneName);

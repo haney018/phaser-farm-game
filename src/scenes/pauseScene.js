@@ -3,6 +3,7 @@ var gameData;
 var resumeButton;
 var restartButton;
 var exitButton;
+var sounds = {};
 
 export default class PauseScene extends Phaser.Scene {
   constructor () {
@@ -20,9 +21,15 @@ export default class PauseScene extends Phaser.Scene {
     this.load.image('resumeButton', require('../assets/btn_continue.png'));
     this.load.image('restartButton', require('../assets/btn_restart.png'));
     this.load.image('exitButton', require('../assets/btn_exit.png'));
+    this.load.audio('click', require(`../assets/audio/button/button.mp3`));
+    this.load.audio('hover', require(`../assets/audio/button/hover.mp3`));
   }
 
   create() {
+    sounds.clickSound = this.sound.add('click');
+    sounds.hoverSound = this.sound.add('hover');
+    sounds.hoverSound.volume = 0.2
+
     let modal = this.add.image(0, 0, 'modal');
     modal.setOrigin(0, 0);
 
@@ -47,6 +54,7 @@ export default class PauseScene extends Phaser.Scene {
     resumeButton.setOrigin(0.5);
     resumeButton.setInteractive( { useHandCursor: true  } );
     resumeButton.on('pointerover', () => {
+      sounds.hoverSound.play();
       this.tweens.add({
         targets: resumeButton,
         scale: { value: 1.1, duration: 100, ease: 'Power1' },
@@ -65,6 +73,7 @@ export default class PauseScene extends Phaser.Scene {
         targets: resumeButton,
         scale: { value: 0.9, duration: 100, ease: 'Power1' },
         onComplete: () => {
+          sounds.clickSound.play();
           this.scene.resume(gameData.sceneName);
           this.scene.stop();
         }
@@ -75,6 +84,7 @@ export default class PauseScene extends Phaser.Scene {
     restartButton.setOrigin(0.5);
     restartButton.setInteractive( { useHandCursor: true  } );
     restartButton.on('pointerover', () => {
+      sounds.hoverSound.play();
       this.tweens.add({
         targets: restartButton,
         scale: { value: 1.1, duration: 100, ease: 'Power1' },
@@ -93,6 +103,7 @@ export default class PauseScene extends Phaser.Scene {
         targets: restartButton,
         scale: { value: 0.9, duration: 100, ease: 'Power1' },
         onComplete: () => {
+          sounds.clickSound.play();
           let currentScene = this.scene.get(gameData.sceneName);
           currentScene.scene.restart();
           this.scene.stop();
@@ -104,6 +115,7 @@ export default class PauseScene extends Phaser.Scene {
     exitButton.setOrigin(0.5);
     exitButton.setInteractive( { useHandCursor: true  } );
     exitButton.on('pointerover', () => {
+      sounds.hoverSound.play();
       this.tweens.add({
         targets: exitButton,
         scale: { value: 1.1, duration: 100, ease: 'Power1' },
@@ -122,6 +134,7 @@ export default class PauseScene extends Phaser.Scene {
         targets: exitButton,
         scale: { value: 0.9, duration: 100, ease: 'Power1' },
         onComplete: () => {
+          sounds.clickSound.play();
           let currentScene = this.scene.get('ContainerScene');
           currentScene.scene.restart();
           this.scene.stop(gameData.sceneName);
