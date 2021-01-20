@@ -795,8 +795,9 @@ export default class GameFowl extends Phaser.Scene {
       }
 
       /* Update z-index state */
-      let boundC = this.zIndexOverlaps.children.entries[i].getBounds();
-      let isBehind = Phaser.Geom.Intersects.RectangleToRectangle(boundsA, boundC)
+      let boundsC = this.zIndexOverlaps.children.entries[i].getBounds();
+      let boundsD = player.getBounds();
+      let isBehind = Phaser.Geom.Intersects.RectangleToRectangle(boundsC, boundsD)
       if (isBehind) {
         this.coops.children.entries[i].setDepth(3);
       } else {

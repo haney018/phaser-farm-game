@@ -48,17 +48,17 @@ export default class GameScrambled extends Phaser.Scene {
     timeLimitSec = 121;
     timer;
     chickenGroupData = [
-      { x: 0, y: 180, value: 0, selected: false, bar: null, type: null, isComplete: false },
-      { x: 660, y: 180, value: 0, selected: false, bar: null, type: null, isComplete: false },
-      { x: 1395, y: 180, value: 0, selected: false, bar: null, type: null, isComplete: false },
+      { x: 0, y: 180, value: 0, selected: false, bar: null, type: null, isComplete: false, sounds: {} },
+      { x: 660, y: 180, value: 0, selected: false, bar: null, type: null, isComplete: false, sounds: {} },
+      { x: 1395, y: 180, value: 0, selected: false, bar: null, type: null, isComplete: false, sounds: {} },
 
-      { x: 0, y: 470, value: 0, selected: false, bar: null, type: null, isComplete: false },
-      { x: 660, y: 470, value: 0, selected: false, bar: null, type: null, isComplete: false },
-      { x: 1395, y: 470, value: 0, selected: false, bar: null, type: null, isComplete: false },
+      { x: 0, y: 470, value: 0, selected: false, bar: null, type: null, isComplete: false, sounds: {} },
+      { x: 660, y: 470, value: 0, selected: false, bar: null, type: null, isComplete: false, sounds: {} },
+      { x: 1395, y: 470, value: 0, selected: false, bar: null, type: null, isComplete: false, sounds: {} },
     
-      { x: 0, y: 770, value: 0, selected: false, bar: null, type: null, isComplete: false },
-      { x: 660, y: 770, value: 0, selected: false, bar: null, type: null, isComplete: false },
-      { x: 1395, y: 770, value: 0, selected: false, bar: null, type: null, isComplete: false },
+      { x: 0, y: 770, value: 0, selected: false, bar: null, type: null, isComplete: false, sounds: {} },
+      { x: 660, y: 770, value: 0, selected: false, bar: null, type: null, isComplete: false, sounds: {} },
+      { x: 1395, y: 770, value: 0, selected: false, bar: null, type: null, isComplete: false, sounds: {} }
     ];
     chickenTypes = ['shrub', 'tree', 'shelter']
     collider_p2c = true;
@@ -109,6 +109,15 @@ export default class GameScrambled extends Phaser.Scene {
     this.load.image("pauseButton", require('../assets/btn_pause.png'));
     this.load.image("timerBlob", require('../assets/gen_timerblob.png'));
 
+    this.load.audio('click', require(`../assets/audio/button/button.mp3`));
+    this.load.audio('hover', require(`../assets/audio/button/hover.mp3`));
+    this.load.audio('walk', require(`../assets/audio/character/walk.mp3`));
+    this.load.audio('cluck', require(`../assets/audio/chicken/cluck.wav`));
+    this.load.audio('puff', require(`../assets/audio/puff.mp3`));
+    this.load.audio('build', require(`../assets/audio/wood-hit.mp3`));
+    this.load.audio('pick', require(`../assets/audio/pickup.mp3`));
+
+
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.spaceBar.on('down', () => { 
       this.spaceBarDown = true 
@@ -148,10 +157,15 @@ export default class GameScrambled extends Phaser.Scene {
     sounds.walkSound = this.sound.add('walk');
     sounds.walkSound.loop = true
     sounds.walkSound.volume = 0.2
-    sounds.splat1Sound = this.sound.add('splat1');
-    sounds.splat2Sound = this.sound.add('splat2');
-    sounds.flySound = this.sound.add('flySound');
     sounds.cluckSound = this.sound.add('cluck');
+    sounds.puff = this.sound.add('puff');
+    sounds.build = this.sound.add('build');
+    sounds.pick = this.sound.add('pick');
+
+
+    // for (let i = 0; i < chickenGroupData.length; i++) {
+    //   chickenGroupData[i].sounds.puff = this.sound.add('puff');
+    // }
   }
 
   createField() {
@@ -207,7 +221,7 @@ export default class GameScrambled extends Phaser.Scene {
       zIndex._dataIndex = i
       this.zIndexOverlaps.add(zIndex)
 
-      let interact = this.add.zone(obj.x + 50, obj.y + 120).setSize(chickenImage.displayWidth - 100, 90);
+      let interact = this.add.zone(obj.x + 25, obj.y + 120).setSize(chickenImage.displayWidth - 50, 90);
       this.physics.world.enable(interact);
       interact.body.setAllowGravity(false);
       interact.body.moves = false;
@@ -383,7 +397,7 @@ export default class GameScrambled extends Phaser.Scene {
     vertical.setOrigin(0);
     playerData.interactZone.add(vertical)
 
-    let horizontal = this.add.zone(player.x, player.y).setSize(60, 10);
+    let horizontal = this.add.zone(player.x, player.y).setSize(90, 10);
     this.physics.world.enable(horizontal);
     horizontal.body.setAllowGravity(false);
     horizontal.body.debugBodyColor = 0x00ffff
@@ -503,6 +517,7 @@ export default class GameScrambled extends Phaser.Scene {
     pauseButton.setInteractive( { useHandCursor: true  } );
 
     pauseButton.on('pointerover', () => {
+      sounds.hoverSound.play();
       this.tweens.add({
         targets: pauseButton,
         scale: { value: 1.1, duration: 100, ease: 'Power1' },
@@ -522,6 +537,7 @@ export default class GameScrambled extends Phaser.Scene {
         targets: pauseButton,
         scale: { value: 0.9, duration: 100, ease: 'Power1' },
         onComplete: () => {
+          sounds.clickSound.play();
           this.scene.launch('PauseScene', gameData);
           this.scene.pause();
         }
@@ -660,6 +676,7 @@ export default class GameScrambled extends Phaser.Scene {
           playerData.interactType = 'p2c';
           chickenGroupData[index].value = 0
           playerData.value = 0
+          sounds.build.play();
 
           timer = setInterval(() => {
             sec = sec + intervalTime
@@ -672,8 +689,8 @@ export default class GameScrambled extends Phaser.Scene {
               playerData.equip = null;
               playerData.returnImageOrigin = null
               clearInterval(timer)
-
               this.poofEffects.children.entries[index].anims.play('poofing', true);
+              sounds.puff.play();
               setTimeout(() => {
                 chickenGroupData[index].bar.setVisible(false)
                 chickenGroupData[index].isComplete = true
@@ -739,6 +756,7 @@ export default class GameScrambled extends Phaser.Scene {
     setTimeout(() => {
       let randIndex = Math.floor(Math.random() * Math.floor(chickenTypes.length))
       this.poofEffects.children.entries[index].anims.play('poofing', true);
+      sounds.puff.play();
       setTimeout(() => {
         let newType = chickenTypes[randIndex]
         let chickenImage = this.chickens.children.entries[index]
@@ -748,7 +766,7 @@ export default class GameScrambled extends Phaser.Scene {
         let deduction = newType === 'shrub' ? 200 : 90
         chickenImage.body.setSize(chickenImage.displayWidth - deduction, 10);
       }, 500);
-    }, 4500); 
+    }, 5000); 
   }
 
   randomChicken() {
@@ -761,7 +779,7 @@ export default class GameScrambled extends Phaser.Scene {
     let intervalTime = 500
 
     if (this.spaceBarDown || this.isActionPad) {
-      if (collider_p2f) {
+      if (collider_p2f && !playerData.equip) {
         collider_p2f = false
 
         let sec = 0;
@@ -774,6 +792,7 @@ export default class GameScrambled extends Phaser.Scene {
           sec = sec + intervalTime
           playerData.value = playerData.value + ((100 * intervalTime) / processTime);
           if (sec > processTime) {
+            sounds.pick.play();
             playerData.isInteracting = false;
             playerData.interactType = null;
             playerData.value = 0
@@ -788,14 +807,14 @@ export default class GameScrambled extends Phaser.Scene {
 
   createTimers() {
     this.coopTimer = this.time.addEvent({
-      delay: progressTime,                // ms
+      delay: progressTime,
       callback: () => {
         for (let i = 0; i < chickenGroupData.length; i++) {
           let random;
           if (chickenGroupData[i].value < 80) {
-            random = Math.floor(Math.random() *  Math.floor(9));
+            random = Math.floor(Math.random() *  Math.floor(7));
           } else {
-            random = Math.floor(Math.random() *  Math.floor(3));
+            random = Math.floor(Math.random() *  Math.floor(2));
           }
           chickenGroupData[i].value = chickenGroupData[i].value + random;
           if (chickenGroupData[i].value >= 100) {
@@ -868,18 +887,23 @@ export default class GameScrambled extends Phaser.Scene {
       player.anims.play('interact-coop')
     } else {
       if (this.cursors.right.isDown || this.wasd.right.isDown || this.isRightPad) {
+        if (!sounds.walkSound.isPlaying) sounds.walkSound.play();
         player.setVelocityX(moveSpeed);
         player.anims.play('right', true);
       } else if (this.cursors.left.isDown || this.wasd.left.isDown || this.isLeftPad) {
+        if (!sounds.walkSound.isPlaying) sounds.walkSound.play();
         player.setVelocityX(-moveSpeed);
         player.anims.play('left', true);
       } else if (this.cursors.down.isDown || this.wasd.down.isDown || this.isDownPad) {
+        if (!sounds.walkSound.isPlaying) sounds.walkSound.play();
         player.setVelocityY(moveSpeed);
         player.anims.play('down', true);
       } else if (this.cursors.up.isDown || this.wasd.up.isDown || this.isUpPad) {
+        if (!sounds.walkSound.isPlaying) sounds.walkSound.play();
         player.setVelocityY(-moveSpeed);
         player.anims.play('up', true);
       } else {
+        sounds.walkSound.stop();
         player.anims.play('turn');
       }
     }
@@ -893,7 +917,7 @@ export default class GameScrambled extends Phaser.Scene {
     if (playerData.interactZone) {
       playerData.interactZone.children.entries[0].x = player.x - 5
       playerData.interactZone.children.entries[0].y = player.y - 75
-      playerData.interactZone.children.entries[1].x = player.x - 25
+      playerData.interactZone.children.entries[1].x = player.x - 45
       playerData.interactZone.children.entries[1].y = player.y + 10
     }
 
