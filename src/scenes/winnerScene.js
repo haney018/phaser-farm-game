@@ -21,7 +21,7 @@ export default class WinnerScene extends Phaser.Scene {
     this.load.image('restartButton', require('../assets/btn_restart.png'));
     this.load.image('exitButton', require('../assets/btn_exit.png'));
 
-    this.load.audio('winner', require(`../assets/audio/winner/winner.wav`));
+    this.load.audio('winner', require(`../assets/audio/winner/winner.mp3`));
     this.load.audio('click', require(`../assets/audio/button/button.mp3`));
     this.load.audio('hover', require(`../assets/audio/button/hover.mp3`));
   }
@@ -38,7 +38,7 @@ export default class WinnerScene extends Phaser.Scene {
 
     const screenCenterX = this.cameras.main.worldView.x + this.cameras.main.width / 2;
 
-    let text1 = this.add.text(screenCenterX, 220, 'CONGRATULATION!', {
+    let text1 = this.add.text(screenCenterX, 220, 'CONGRATULATIONS!', {
       wordWrap: { width: 1200, useAdvancedWrap: true }
     });
     text1.setOrigin(0.5);

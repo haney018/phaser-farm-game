@@ -112,7 +112,7 @@ export default class GameScrambled extends Phaser.Scene {
     this.load.audio('click', require(`../assets/audio/button/button.mp3`));
     this.load.audio('hover', require(`../assets/audio/button/hover.mp3`));
     this.load.audio('walk', require(`../assets/audio/character/walk.mp3`));
-    this.load.audio('cluck', require(`../assets/audio/chicken/cluck.wav`));
+    this.load.audio('cluck', require(`../assets/audio/chicken/cluck.mp3`));
     this.load.audio('puff', require(`../assets/audio/puff.mp3`));
     this.load.audio('build', require(`../assets/audio/wood-hit.mp3`));
     this.load.audio('pick', require(`../assets/audio/pickup.mp3`));
@@ -586,7 +586,7 @@ export default class GameScrambled extends Phaser.Scene {
     this.dpad = this.add.image(250, 850, 'dpad');
     this.dpad.setDepth(4);
     this.dpad.setScale(0.7);
-    this.dpad.alpha = .5;
+    this.dpad.alpha = .8;
 
     this.upDpad = this.add.image(this.dpad.x, (this.dpad.y + 50) - this.dpad.displayHeight / 2, "hidden-dpad");
     this.upDpad.setScale(0.8);
@@ -665,7 +665,7 @@ export default class GameScrambled extends Phaser.Scene {
 
     this.activeIndex = index
     if (this.spaceBarDown || this.isActionPad) {
-      if (collider_p2c && playerData.equip) {
+      if (collider_p2c && playerData.equip && !playerData.isInteracting) {
         collider_p2c = false
 
         let currentType = chickenGroupData[index].type
@@ -707,6 +707,9 @@ export default class GameScrambled extends Phaser.Scene {
           let origin = playerData.returnImageOrigin
 
           chickenGroupData[index].value = currentValue + 30;
+          if (chickenGroupData[index].value > 100) {
+            chickenGroupData[index].value = 100
+          }
           returnImage.x = player.x
           returnImage.y = player.y - 100
           returnImage.setTexture(`mat-${type}`)
@@ -766,7 +769,7 @@ export default class GameScrambled extends Phaser.Scene {
         let deduction = newType === 'shrub' ? 200 : 90
         chickenImage.body.setSize(chickenImage.displayWidth - deduction, 10);
       }, 500);
-    }, 5000); 
+    }, 8000); 
   }
 
   randomChicken() {
@@ -779,11 +782,13 @@ export default class GameScrambled extends Phaser.Scene {
     let intervalTime = 500
 
     if (this.spaceBarDown || this.isActionPad) {
-      if (collider_p2f && !playerData.equip) {
-        collider_p2f = false
-
+      if (collider_p2f && !playerData.isInteracting) {
         let sec = 0;
         let type = materialZone._data;
+
+        if (playerData.equip === type) return
+        collider_p2f = false
+
         playerData.value = 0;
         playerData.isInteracting = true;
         playerData.interactType = 'p2f';
@@ -852,7 +857,8 @@ export default class GameScrambled extends Phaser.Scene {
   }
 
   updateGamepad() {
-    if (this.sys.game.device.os.desktop){
+    console.log(this.sys.game.device)
+    if (this.sys.game.device.os.desktop || !this.sys.game.device.browser.mobileSafari){
       this.dpad.visible = false;
       this.upDpad.visible = false;
       this.downDpad.visible = false;
@@ -870,12 +876,14 @@ export default class GameScrambled extends Phaser.Scene {
       this.actionGroup.visible = true;
       this.actionGroup.setVisible(true);
 
-      let hasSelected = chickenGroupData.filter(val => val.selected)
-      if (hasSelected.length) {
-        this.actionGroup.setAlpha(0.5);
-      } else {
-        this.actionGroup.setAlpha(0.1);
-      }
+      this.actionGroup.setAlpha(0.9);
+
+      // let hasSelected = chickenGroupData.filter(val => val.selected)
+      // if (hasSelected.length) {
+      //   this.actionGroup.setAlpha(0.5);
+      // } else {
+      //   this.actionGroup.setAlpha(0.1);
+      // }
     }
 
     

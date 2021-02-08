@@ -91,10 +91,10 @@ export default class GameFowl extends Phaser.Scene {
     this.load.audio('click', require(`../assets/audio/button/button.mp3`));
     this.load.audio('hover', require(`../assets/audio/button/hover.mp3`));
     this.load.audio('walk', require(`../assets/audio/character/walk.mp3`));
-    this.load.audio('flySound', require(`../assets/audio/fowl-flies/flySound.wav`));
-    this.load.audio('splat1', require(`../assets/audio/fowl-splat/splat1.wav`));
-    this.load.audio('splat2', require(`../assets/audio/fowl-splat/splat2.wav`));
-    this.load.audio('cluck', require(`../assets/audio/chicken/cluck.wav`));
+    this.load.audio('flySound', require(`../assets/audio/fowl-flies/flySound.mp3`));
+    this.load.audio('splat1', require(`../assets/audio/fowl-splat/splat1.mp3`));
+    this.load.audio('splat2', require(`../assets/audio/fowl-splat/splat2.mp3`));
+    this.load.audio('cluck', require(`../assets/audio/chicken/cluck.mp3`));
 
 
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -488,7 +488,7 @@ export default class GameFowl extends Phaser.Scene {
     this.dpad = this.add.image(250, 850, 'dpad');
     this.dpad.setDepth(4);
     this.dpad.setScale(0.7);
-    this.dpad.alpha = .5;
+    this.dpad.alpha = .8;
 
     this.upDpad = this.add.image(this.dpad.x, (this.dpad.y + 50) - this.dpad.displayHeight / 2, "hidden-dpad");
     this.upDpad.setScale(0.8);
@@ -604,7 +604,7 @@ export default class GameFowl extends Phaser.Scene {
     let intervalTime = 500
 
     if (this.spaceBarDown || this.isActionPad) {
-      if (collider_p2f) {
+      if (collider_p2f && !playerData.isInteracting) {
         collider_p2f = false
 
         if (playerData.value <= 100 && playerData.value > 0) {
@@ -679,7 +679,7 @@ export default class GameFowl extends Phaser.Scene {
   }
 
   updateGamepad() {
-    if (this.sys.game.device.os.desktop){
+    if (this.sys.game.device.os.desktop || !this.sys.game.device.browser.mobileSafari){
       this.dpad.visible = false;
       this.upDpad.visible = false;
       this.downDpad.visible = false;
@@ -702,12 +702,14 @@ export default class GameFowl extends Phaser.Scene {
       let boundsB = this.fertOverlap.children.entries[0].getBounds();
       let inFertilizer = Phaser.Geom.Intersects.RectangleToRectangle(boundsA, boundsB)
 
-      if (hasSelected.length || inFertilizer) {
-        this.actionLabel.setText(inFertilizer ? ' Empty ' : 'Collect')
-        this.actionGroup.setAlpha(0.6);
-      } else {
-        this.actionGroup.setAlpha(0.1);
-      }
+      this.actionGroup.setAlpha(0.8);
+
+      // if (hasSelected.length || inFertilizer) {
+      //   this.actionLabel.setText(inFertilizer ? ' Empty ' : 'Collect')
+      //   this.actionGroup.setAlpha(0.6);
+      // } else {
+      //   this.actionGroup.setAlpha(0.1);
+      // }
     }
 
     
@@ -776,7 +778,6 @@ export default class GameFowl extends Phaser.Scene {
   }
 
   updateInteractableMovement() {
-    console.log(this.activeIndex)
     for (let i = 0; i < coopListData.length; i++) {
       /* Update select state */
       let animKey

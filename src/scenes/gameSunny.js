@@ -101,16 +101,12 @@ export default class GameSunny extends Phaser.Scene {
     this.load.audio('click', require(`../assets/audio/button/button.mp3`));
     this.load.audio('hover', require(`../assets/audio/button/hover.mp3`));
     this.load.audio('walk', require(`../assets/audio/character/walk.mp3`));
-    this.load.audio('honk', require(`../assets/audio/honking/honking.wav`));
-    this.load.audio('conveyorSound', require(`../assets/audio/conveyor/conveyor.wav`));
-    this.load.audio('onSound', [
-      require(`../assets/audio/switch-button/switch-on.wav`),
-      require(`../assets/audio/switch-button/switch-on.mp3`),
-    ]);
-    this.load.audio('offSound', [
-      require(`../assets/audio/switch-button/switch-off.wav`),
-      require(`../assets/audio/switch-button/switch-off.mp3`),
-    ]);
+    this.load.audio('honk', require(`../assets/audio/honking/honking.mp3`));
+    this.load.audio('conveyorSound', require(`../assets/audio/conveyor/conveyor.mp3`));
+    this.load.audio('conveyorOnSound', require(`../assets/audio/conveyor/power_on.mp3`));
+    this.load.audio('conveyorOffSound', require(`../assets/audio/conveyor/power_off.mp3`));
+    this.load.audio('onSound', require(`../assets/audio/switch-button/switch-on.mp3`));
+    this.load.audio('offSound', require(`../assets/audio/switch-button/switch-off.mp3`));
 
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.spaceBar.on('down', () => { 
@@ -155,6 +151,8 @@ export default class GameSunny extends Phaser.Scene {
     sounds.honkSound = this.sound.add('honk');
     sounds.conveyorSound = this.sound.add('conveyorSound');
     sounds.conveyorSound.loop = true
+    sounds.conveyorOnSound = this.sound.add('conveyorOnSound');
+    sounds.conveyorOffSound = this.sound.add('conveyorOffSound');
   }
 
   createField() {
@@ -214,24 +212,35 @@ export default class GameSunny extends Phaser.Scene {
 
     for (let i = 0; i < panelKeyValue.length; i++) {
       let keyVal = 'panel-' + panelKeyValue[i];
-      
-      this.anims.create({
-        key: keyVal,
-        frames: [ { key: 'panel', frame: i } ],
-        frameRate: 20
-      });
+
+      if (panelKeyValue[i] >= 80) {
+        this.anims.create({
+          key: keyVal,
+          frames: this.anims.generateFrameNumbers('panel', { start: 6, end: 7 }),
+          frameRate: 5,
+          repeat: -1
+        });
+      } else {
+        this.anims.create({
+          key: keyVal,
+          frames: [ { key: 'panel', frame: i } ],
+          frameRate: 20
+        });
+      }
     }
 
     this.anims.create({
       key: 'panel-80-selected',
-      frames: [ { key: 'panel', frame: 13 } ],
-      frameRate: 20
+      frames: this.anims.generateFrameNumbers('panel', { start: 13, end: 14 }),
+      frameRate: 5,
+      repeat: -1
     });
 
     this.anims.create({
       key: 'panel-100-selected',
-      frames: [ { key: 'panel', frame: 14 } ],
-      frameRate: 20
+      frames: this.anims.generateFrameNumbers('panel', { start: 13, end: 14 }),
+      frameRate: 5,
+      repeat: -1
     });
 
     this.anims.create({
@@ -511,7 +520,7 @@ export default class GameSunny extends Phaser.Scene {
     this.activeIndex = index
 
     if (this.spaceBarDown || this.isActionPad) {
-      if (collider_p2c && panelData[index].interactable) {
+      if (collider_p2c && panelData[index].interactable && !playerData.isInteracting) {
         collider_p2c = false
         sounds.onSound.play();
 
@@ -519,7 +528,7 @@ export default class GameSunny extends Phaser.Scene {
         let sec = 0
         let deduction = panelData[index].value / (solarTime / intervalTime);
 
-        driverLevel = driverLevel - 10
+        driverLevel = 0
         playerData.isInteracting = true;
         playerData.interactType = 'p2c';
         panelData[index].isOn = true
@@ -575,7 +584,7 @@ export default class GameSunny extends Phaser.Scene {
       delay: 2000,                // ms
       callback: () => {
         if (!hasPower) {
-          driverLevel = driverLevel + 5
+          driverLevel = driverLevel + 10
           if (driverLevel >= 100) {
             this.driverTimer.remove();
             this.scene.launch('LoseScene', gameData);
@@ -600,7 +609,7 @@ export default class GameSunny extends Phaser.Scene {
   }
 
   updateGamepad() {
-    if (this.sys.game.device.os.desktop){
+    if (this.sys.game.device.os.desktop || !this.sys.game.device.browser.mobileSafari){
       this.dpad.visible = false;
       this.upDpad.visible = false;
       this.downDpad.visible = false;
@@ -618,11 +627,12 @@ export default class GameSunny extends Phaser.Scene {
       this.actionGroup.setVisible(true);
 
       let hasSelected = panelData.filter(val => val.selected)
-      if (hasSelected.length) {
-        this.actionGroup.setAlpha(0.8);
-      } else {
-        this.actionGroup.setAlpha(0.1);
-      }
+      this.actionGroup.setAlpha(0.9);
+      // if (hasSelected.length) {
+      //   this.actionGroup.setAlpha(0.8);
+      // } else {
+      //   this.actionGroup.setAlpha(0.1);
+      // }
     }
   }
 
@@ -730,14 +740,28 @@ export default class GameSunny extends Phaser.Scene {
 
   updateNonInteractMovement() {
     let panelOn = panelData.filter(val => val.isOn)
+    let isOff = hasPower === false
+    let isOn = hasPower === true
     hasPower = panelOn.length ? true : false
     if (hasPower) {
+      if (isOff) {
+        sounds.conveyorOffSound.stop();
+        if (!sounds.conveyorOnSound.isPlaying) sounds.conveyorOnSound.play();
+        setTimeout(() => {
+          if (!sounds.conveyorSound.isPlaying) sounds.conveyorSound.play();
+        }, 2000);
+      } else {
+        if (!sounds.conveyorSound.isPlaying) sounds.conveyorSound.play();
+      }
       this.convCollider.children.entries[0].anims.play('conveyor-run', true)
-      if (!sounds.conveyorSound.isPlaying) sounds.conveyorSound.play();
       // if (sounds)
     } else {
       this.convCollider.children.entries[0].anims.pause()
       sounds.conveyorSound.stop();
+      if (isOn) {
+        if (!sounds.conveyorOffSound.isPlaying) sounds.conveyorOffSound.play();
+      }
+      
     }
 
     if (driverLevel >= 60) {

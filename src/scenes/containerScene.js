@@ -1,4 +1,4 @@
-var activeGameId = 'fowl';
+var activeGameId = 'shade';
 var counter = 0;
 var loadingText;
 var gameData = {
@@ -31,7 +31,7 @@ var gameData = {
     introPath: 'scrambled-shade/shade_intro.png',
     worldPath: 'scrambled-shade/shade_backround.jpg',
     helpPath: 'scrambled-shade/shade_instructions.png',
-    winText: 'You sure made the hens had shelter out of the hot sun',
+    winText: 'You made sure the hens had shelter out of the hot sun',
     loseText: 'You didn\'t give the hens enough shade out of the hot sun',
     player: null
   }
@@ -44,7 +44,7 @@ export default class ContainerScene extends Phaser.Scene {
 
   preload() {
     this.load.image('world', require(`../assets/${gameData[activeGameId].worldPath}`));
-    this.load.audio('farm-music', [require(`../assets/audio/farm-music/a-little-farm.wav`), require(`../assets/audio/farm-music/a-little-farm.mp3`)]);
+    this.load.audio('farm-music', require(`../assets/audio/farm-music/a-little-farm.mp3`));
   }
 
   create() {

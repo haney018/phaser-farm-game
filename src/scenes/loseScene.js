@@ -21,7 +21,7 @@ export default class LoseScene extends Phaser.Scene {
     this.load.image('exitButton-lose', require('../assets/btn_exit.png'));
 
     // this.load.setPath('../assets/audio');
-    this.load.audio('try-again', [ require(`../assets/audio/try-again/try-again.wav`), require(`../assets/audio/try-again/try-again.mp3`) ]);
+    this.load.audio('try-again', require(`../assets/audio/try-again/try-again.mp3`));
     this.load.audio('click', require(`../assets/audio/button/button.mp3`));
     this.load.audio('hover', require(`../assets/audio/button/hover.mp3`));
   }

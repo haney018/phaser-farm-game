@@ -162,7 +162,7 @@ export default class Scene1 extends Phaser.Scene {
   createGamepad() {
     this.dpad = this.add.image(150, 480, 'dpad');
     this.dpad.setScale(0.4);
-    this.dpad.alpha = .5;
+    this.dpad.alpha = .8;
 
     this.upDpad = this.add.image(this.dpad.x, (this.dpad.y + 20) - this.dpad.displayHeight / 2, "hidden-dpad");
     this.upDpad.setScale(0.5);
@@ -246,7 +246,7 @@ export default class Scene1 extends Phaser.Scene {
   }
 
   updateGamepad() {
-    if (this.sys.game.device.os.desktop){
+    if (this.sys.game.device.os.desktop || !this.sys.game.device.browser.mobileSafari){
       this.dpad.visible = false;
       this.upDpad.visible = false;
       this.downDpad.visible = false;
