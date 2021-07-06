@@ -371,7 +371,6 @@ export default class GameScrambled extends Phaser.Scene {
       // matImage.body.setOffset(0, -100);
       // matImage.setSize(100, 50);
       // matImage.setBottom(-50)
-      // console.log(matImage)
       xPos = xPos + 200;
     }
 
@@ -665,7 +664,7 @@ export default class GameScrambled extends Phaser.Scene {
 
     this.activeIndex = index
     if (this.spaceBarDown || this.isActionPad) {
-      if (collider_p2c && playerData.equip && !playerData.isInteracting) {
+      if (collider_p2c && playerData.equip && !playerData.isInteracting && !chickenGroupData[index].isComplete) {
         collider_p2c = false
 
         let currentType = chickenGroupData[index].type
@@ -763,13 +762,14 @@ export default class GameScrambled extends Phaser.Scene {
       setTimeout(() => {
         let newType = chickenTypes[randIndex]
         let chickenImage = this.chickens.children.entries[index]
+        chickenGroupData[index].value = 5;
         chickenGroupData[index].bar.setVisible(true)
         chickenGroupData[index].isComplete = false
         chickenGroupData[index].type = newType
         let deduction = newType === 'shrub' ? 200 : 90
         chickenImage.body.setSize(chickenImage.displayWidth - deduction, 10);
       }, 500);
-    }, 8000); 
+    }, 35000); 
   }
 
   randomChicken() {
@@ -844,10 +844,6 @@ export default class GameScrambled extends Phaser.Scene {
     });
   }
 
-  run() {
-    console.log('asdas')
-  }
-
   update() {
     this.updateGamepad();
     this.updatePlayerMovement();
@@ -857,7 +853,6 @@ export default class GameScrambled extends Phaser.Scene {
   }
 
   updateGamepad() {
-    console.log(this.sys.game.device)
     if (this.sys.game.device.os.desktop || !this.sys.game.device.browser.mobileSafari){
       this.dpad.visible = false;
       this.upDpad.visible = false;

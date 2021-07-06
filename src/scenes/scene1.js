@@ -64,7 +64,6 @@ export default class Scene1 extends Phaser.Scene {
     this.physics.add.collider(this.player, this.coops, (player, coop) => {
       coop._level =  coop._level - 10;
       coop.setValue(coop._level)
-      console.log(coop._level)
     }, null, this);
 
     this.text = this.add.text(320, 300, 'asdasd').setAlign('center').setOrigin(0.5, 0);
